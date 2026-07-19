@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Style Genome">
+  <defs><clipPath id="r"><rect width="64" height="64" rx="17"/></clipPath></defs>
+  <g clip-path="url(#r)">
+    <path fill="#e5484d" d="M32 32 0 16V0h32z"/><path fill="#f5a524" d="M32 32V0h32v8z"/>
+    <path fill="#30a46c" d="m32 32 32-24v32z"/><path fill="#3e63dd" d="m32 32 32 8v24H40z"/>
+    <path fill="#8e4ec6" d="m32 32 8 32H0V48z"/><path fill="#e5484d" d="M32 32 0 48V16z"/>
+  </g>
+</svg>
