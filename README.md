@@ -14,6 +14,8 @@ The point: AI-generated websites all converge on the same look. A few human
 gut-choices through a deliberately diverse style space land you somewhere
 specific — and the exported prompt pins an AI to that spot.
 
+<img width="777" alt="image" src="https://github.com/user-attachments/assets/fce4b857-53ee-4eea-82ec-4050b4e51f21" />
+
 ## Run it
 
 Static site, no build step, no dependencies. ES modules need an HTTP server:
