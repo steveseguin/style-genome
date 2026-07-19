@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Style Genome — archetype gallery</title>
+<link rel="stylesheet" href="css/app.css">
+<style>
+  .gal-note { color: var(--app-muted); font-size: 13.5px; margin: 4px 0 18px; }
+</style>
+</head>
+<body>
+  <header class="apphead">
+    <div class="apphead-inner">
+      <div class="ah-brand"><span class="ah-mark"></span><span class="ah-name">Style Genome — gallery</span></div>
+      <div class="ah-round" id="count"></div>
+      <a class="ah-restart" style="text-decoration:none" href="index.html">← Back to the picker</a>
+    </div>
+  </header>
+  <main class="stage">
+    <section class="intro">
+      <h1>Every archetype, one roll each.</h1>
+      <p class="gal-note">A fixed-seed render of all hand-crafted archetypes (each also varies by palette/params every run of the picker). Reload for a different roll.</p>
+    </section>
+    <section class="tiles" id="gallery"></section>
+  </main>
+  <script type="module" src="js/gallery.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Style Genome — find a look you actually like</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="apphead">
+    <div class="apphead-inner">
+      <div class="ah-brand">
+        <span class="ah-mark"></span>
+        <span class="ah-name">Style Genome</span>
+      </div>
+      <div class="ah-round" id="roundmsg"></div>
+      <a class="ah-restart ah-link" href="gallery.html" title="Browse every archetype">Gallery</a>
+      <button class="ah-restart" id="restartbtn" type="button" title="Start over with a fresh set">Start over</button>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <section class="intro" id="intro">
+      <h1 id="introtitle">Pick the one that draws you in.</h1>
+      <p id="introsub">Twelve deliberately different directions. Don't overthink it — go with your gut. Each round narrows in on your taste.</p>
+      <div class="prefs" id="prefsbar">
+        <span class="prefs-label">Know what you want already?</span>
+        <div class="seg" data-pref="mode" role="group" aria-label="Light or dark mode">
+          <button type="button" data-val="any" class="seg-on">Either</button>
+          <button type="button" data-val="light">Light</button>
+          <button type="button" data-val="dark">Dark</button>
+        </div>
+        <div class="seg" data-pref="energy" role="group" aria-label="Calm or bold energy">
+          <button type="button" data-val="any" class="seg-on">Either</button>
+          <button type="button" data-val="calm">Calm</button>
+          <button type="button" data-val="bold">Bold</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="tiles" id="pickgrid" aria-label="Style options"></section>
+
+    <section class="finale" id="finale" hidden>
+      <aside class="fin-editor" id="fin-editor">
+        <h2 class="fin-h">Tune your style</h2>
+        <div id="editor-controls"></div>
+      </aside>
+      <div class="fin-main">
+        <div class="fin-toolbar">
+          <button type="button" class="tb-btn tb-primary" id="btn-png">Download PNG</button>
+          <button type="button" class="tb-btn" id="btn-copyprompt">Copy LLM prompt</button>
+          <button type="button" class="tb-btn" id="btn-dlprompt">Download prompt (.md)</button>
+          <button type="button" class="tb-btn" id="btn-dljson">Download genome (.json)</button>
+          <span class="tb-note" id="tb-note"></span>
+        </div>
+        <div class="fin-preview-wrap" id="fin-preview-wrap">
+          <div class="fin-preview" id="fin-preview"></div>
+        </div>
+        <details class="fin-prompt" open>
+          <summary>LLM prompt — hand this to any AI to reproduce the style</summary>
+          <textarea id="prompttext" readonly spellcheck="false"></textarea>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

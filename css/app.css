@@ -1,0 +1,311 @@
+/* ---------------------------------------------------------------------------
+   App chrome. Deliberately neutral during the picking rounds so it doesn't
+   bias the choice; once a style is chosen the page re-skins via `body.themed`
+   using the genome's tokens (set as custom properties on <body>).
+--------------------------------------------------------------------------- */
+
+* { box-sizing: border-box; }
+
+:root {
+  --app-bg: #f2f2f0;
+  --app-surface: #ffffff;
+  --app-ink: #1c1c1a;
+  --app-muted: #6e6e68;
+  --app-border: #d8d8d2;
+  --app-font: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--app-bg);
+  color: var(--app-ink);
+  font-family: var(--app-font);
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ------------------------------------------------- header */
+
+.apphead {
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.apphead-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.ah-brand { display: flex; align-items: center; gap: 9px; font-weight: 700; letter-spacing: .01em; }
+
+.ah-mark {
+  width: 15px; height: 15px; border-radius: 4px;
+  background: conic-gradient(from 210deg, #e5484d, #f5a524, #30a46c, #3e63dd, #8e4ec6, #e5484d);
+  display: inline-block;
+}
+
+.ah-round { color: var(--app-muted); font-size: 13.5px; }
+
+.ah-link { text-decoration: none; display: inline-block; }
+.ah-link + .ah-restart { margin-left: 0; }
+.ah-link.ah-restart { margin-left: auto; }
+
+.ah-restart {
+  margin-left: auto;
+  font: inherit; font-size: 13px;
+  color: var(--app-muted);
+  background: transparent;
+  border: 1px solid var(--app-border);
+  border-radius: 7px;
+  padding: 6px 13px;
+  cursor: pointer;
+}
+.ah-restart:hover { color: var(--app-ink); border-color: var(--app-muted); }
+
+/* ------------------------------------------------- stage / intro */
+
+.stage { max-width: 1400px; margin: 0 auto; padding: 26px 24px 60px; }
+
+.intro { margin: 6px 0 22px; }
+.intro h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.01em; }
+.intro p { margin: 0; color: var(--app-muted); max-width: 68ch; }
+
+/* ------------------------------------------------- tile grid */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(315px, 1fr));
+  gap: 18px;
+}
+
+.tile {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.tile:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,.13); }
+.tile:focus-visible { outline: 3px solid #3e63dd; outline-offset: 2px; }
+
+.tile-viewport {
+  width: 100%;
+  aspect-ratio: 860 / 600;
+  overflow: hidden;
+  position: relative;
+  background: #fff;
+}
+.tile-viewport .sample {
+  position: absolute; top: 0; left: 0;
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+.tile-caption {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 9px 13px 10px;
+  border-top: 1px solid var(--app-border);
+}
+.tile-name { font-size: 13px; font-weight: 650; }
+.tile-genes { font-size: 11.5px; color: var(--app-muted); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.tile-fav .tile-name::after {
+  content: "★ current favorite";
+  font-size: 10.5px; font-weight: 600;
+  margin-left: 8px;
+  color: #8a6d1d;
+}
+
+.tile-usebtn {
+  font: inherit; font-size: 11px; font-weight: 600;
+  color: var(--app-muted);
+  background: transparent;
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  padding: 2px 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.tile-usebtn:hover { color: var(--app-ink); border-color: var(--app-muted); }
+
+/* ------------------------------------------------- finale */
+
+.finale[hidden], .tiles[hidden], .intro[hidden], .prefs[hidden] { display: none; }
+
+/* quick filters (round 1 only) */
+
+.prefs { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 15px; }
+.prefs-label {
+  font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--app-muted);
+}
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--app-surface);
+}
+.seg button {
+  font: inherit; font-size: 12.5px; font-weight: 550;
+  padding: 5px 13px;
+  border: none;
+  border-left: 1px solid var(--app-border);
+  background: transparent;
+  color: var(--app-muted);
+  cursor: pointer;
+}
+.seg button:first-child { border-left: none; }
+.seg button:hover { color: var(--app-ink); }
+.seg button.seg-on { background: #1c1c1a; color: #fff; }
+.seg button:focus-visible { outline: 2px solid #3e63dd; outline-offset: -2px; }
+
+.finale {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+@media (max-width: 980px) { .finale { grid-template-columns: 1fr; } }
+
+.fin-editor {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 16px;
+  position: sticky;
+  top: 66px;
+  max-height: calc(100vh - 90px);
+  overflow-y: auto;
+}
+.fin-h { font-size: 15px; margin: 0 0 12px; }
+
+.ed-group { margin-bottom: 16px; }
+.ed-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--app-muted); margin-bottom: 7px;
+}
+
+.ed-swatches { display: flex; flex-direction: column; gap: 6px; }
+.ed-swatch { display: flex; align-items: center; gap: 9px; font-size: 12.5px; }
+.ed-swatch input[type="color"] {
+  width: 30px; height: 24px; padding: 0; border: 1px solid var(--app-border);
+  border-radius: 5px; background: none; cursor: pointer;
+}
+.ed-swatch .sw-role { color: var(--app-ink); }
+.ed-swatch .sw-hex { margin-left: auto; color: var(--app-muted); font-family: ui-monospace, Consolas, monospace; font-size: 11px; }
+
+.ed-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 12.5px; }
+.ed-row > span:first-child { width: 74px; flex-shrink: 0; color: var(--app-ink); }
+.ed-row select, .ed-row input[type="range"] {
+  flex: 1; min-width: 0; font: inherit; font-size: 12.5px;
+  border: 1px solid var(--app-border); border-radius: 6px; padding: 4px 6px;
+  background: var(--app-surface); color: var(--app-ink);
+}
+.ed-row input[type="range"] { padding: 0; border: none; accent-color: #3e63dd; }
+.ed-row .ed-val { width: 34px; text-align: right; color: var(--app-muted); font-size: 11.5px; flex-shrink: 0; }
+
+.ed-note { font-size: 11.5px; color: var(--app-muted); line-height: 1.45; }
+
+/* toolbar */
+
+.fin-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+.tb-btn {
+  font: inherit; font-size: 13px; font-weight: 600;
+  padding: 7px 14px;
+  border: 1px solid var(--app-border);
+  border-radius: 7px;
+  background: var(--app-surface);
+  color: var(--app-ink);
+  cursor: pointer;
+}
+.tb-btn:hover { border-color: var(--app-muted); }
+.tb-primary { background: #1c1c1a; color: #fff; border-color: #1c1c1a; }
+.tb-primary:hover { background: #333; }
+.tb-note { font-size: 12px; color: var(--app-muted); }
+
+/* preview */
+
+.fin-preview-wrap {
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  aspect-ratio: 860 / 600;
+  position: relative;
+}
+.fin-preview { position: absolute; top: 0; left: 0; }
+.fin-preview .sample { transform-origin: top left; }
+
+/* prompt */
+
+.fin-prompt { margin-top: 18px; }
+.fin-prompt summary { cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--app-muted); }
+.fin-prompt summary:hover { color: var(--app-ink); }
+.fin-prompt textarea {
+  width: 100%;
+  height: 340px;
+  margin-top: 10px;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--app-ink);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  padding: 12px;
+  resize: vertical;
+}
+
+/* ---------------------------------------------------------------------------
+   Themed mode: once a style is chosen, the app chrome adopts its tokens.
+--------------------------------------------------------------------------- */
+
+body.themed {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+}
+body.themed .apphead { background: var(--surface); border-bottom: var(--bw) solid var(--border); }
+body.themed .ah-name, body.themed .intro h1, body.themed .fin-h { font-family: var(--f-display); }
+body.themed .ah-mark { background: var(--accent); border-radius: var(--r-ctl); }
+body.themed .ah-round, body.themed .intro p, body.themed .tb-note,
+body.themed .ed-label, body.themed .ed-swatch .sw-hex, body.themed .ed-row .ed-val,
+body.themed .ed-note, body.themed .fin-prompt summary { color: var(--muted); }
+body.themed .ah-restart, body.themed .tb-btn, body.themed .tile-usebtn {
+  background: var(--surface); color: var(--ink);
+  border: var(--bw) solid var(--border);
+  border-radius: var(--r-ctl);
+}
+body.themed .tb-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+body.themed .tb-primary:hover { background: var(--accent); filter: brightness(1.1); }
+body.themed .fin-editor, body.themed .fin-preview-wrap, body.themed .fin-prompt textarea, body.themed .tile {
+  background: var(--surface);
+  border: var(--bw) solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+body.themed .ed-row select {
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--border); border-radius: var(--r-ctl);
+}
+body.themed .ed-swatch .sw-role, body.themed .ed-row > span:first-child { color: var(--ink); }
+body.themed .ed-row input[type="range"] { accent-color: var(--accent); border: none; }
+body.themed .fin-prompt textarea { font-family: var(--f-mono); }
