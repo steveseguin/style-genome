@@ -55,6 +55,19 @@ body {
 
 .ah-round { color: var(--app-muted); font-size: 13.5px; }
 
+.ah-structure { display: flex; align-items: center; gap: 7px; color: var(--app-muted); font-size: 11.5px; }
+.ah-structure span { text-transform: uppercase; letter-spacing: .06em; font-weight: 650; white-space: nowrap; }
+.ah-structure select {
+  max-width: 170px; font: inherit; font-size: 12px; color: var(--app-ink);
+  background: var(--app-surface); border: 1px solid var(--app-border);
+  border-radius: 6px; padding: 5px 7px;
+}
+@media (max-width: 720px) {
+  .apphead-inner { flex-wrap: wrap; gap: 9px 13px; }
+  .ah-structure { order: 3; width: 100%; }
+  .ah-link.ah-restart { margin-left: auto; }
+}
+
 .ah-link { text-decoration: none; display: inline-block; }
 .ah-link + .ah-restart { margin-left: 0; }
 .ah-link.ah-restart { margin-left: auto; }
@@ -67,7 +80,7 @@ body {
   border: 1px solid var(--app-border);
   border-radius: 7px;
   padding: 6px 13px;
-  cursor: pointer;
+  cursor: default;
 }
 .ah-restart:hover { color: var(--app-ink); border-color: var(--app-muted); }
 
@@ -110,6 +123,7 @@ body {
   overflow: hidden;
   position: relative;
   background: #fff;
+  cursor: pointer;
 }
 .tile-viewport .sample {
   position: absolute; top: 0; left: 0;
@@ -122,6 +136,12 @@ body {
   padding: 9px 13px 10px;
   border-top: 1px solid var(--app-border);
 }
+.tile-choose {
+  min-width: 0; flex: 1; display: flex; align-items: baseline; gap: 10px;
+  padding: 0; border: 0; background: transparent; color: inherit;
+  font: inherit; text-align: left; cursor: pointer;
+}
+.tile-choose:focus-visible { outline: 2px solid #3e63dd; outline-offset: 4px; border-radius: 2px; }
 .tile-name { font-size: 13px; font-weight: 650; }
 .tile-genes { font-size: 11.5px; color: var(--app-muted); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -305,6 +325,10 @@ body.themed .fin-editor, body.themed .fin-preview-wrap, body.themed .fin-prompt 
 body.themed .ed-row select {
   background: var(--surface); color: var(--ink);
   border: 1px solid var(--border); border-radius: var(--r-ctl);
+}
+body.themed .ah-structure { color: var(--muted); }
+body.themed .ah-structure select {
+  background: var(--surface); color: var(--ink); border-color: var(--border); border-radius: var(--r-ctl);
 }
 body.themed .ed-swatch .sw-role, body.themed .ed-row > span:first-child { color: var(--ink); }
 body.themed .ed-row input[type="range"] { accent-color: var(--accent); border: none; }

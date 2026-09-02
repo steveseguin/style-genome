@@ -18,7 +18,7 @@ export const craftPrint = [
     blurb:
       "A hand-set letterpress broadside on warm cotton stock: one deep umber-charcoal ink pressed into toothy cream paper, headings debossed so the type reads punched into the sheet, and small centered diamond ornaments dividing each block. Buttons feel physically pushed in. Artisanal, quiet, and unmistakably printed by impression rather than screen.",
     notes: [
-      "Headings, brand, and stat figures are debossed: colored slightly lighter than the full ink with a single white lower highlight (text-shadow 0 1px 0), so they read pressed into the paper.",
+      "Headings, brand, and stat figures have a clearly perceptible deboss at normal 1x viewing: a dark upper impression plus a light lower paper edge, not a faint generic text shadow.",
       "Buttons carry inset shadows instead of drop shadows — a dark top-inner shadow with a thin light bottom edge, as if pushed into the stock.",
       "Card titles are centered with a small muted diamond ornament rule (◆ ◆ ◆) beneath them; masthead and footer use a fine double rule.",
       "A single deep ink over paper-grain texture; all type is uppercase small-caps style with wide tracking and hatched bar charts.",
@@ -35,22 +35,24 @@ export const craftPrint = [
       g.shadow = "none"; g.texture = "paper";
       g.density = "normal";
       g.case = "upper"; g.hw = pick(r, [500, 600]); g.track = pick(r, [0.08, 0.1, 0.12]);
-      g.chart = "bars-hatch";
+      g.chart = "bars";
+      g.chartTreatment = "crosshatch";
+      g.chartGrid = "baseline";
     },
     css(s, g) {
       const deb = mix(g.p.ink, g.p.bg, 0.3);
       return `
 ${s} .display {
-  color: ${deb}; text-shadow: 0 1px 0 rgba(255,255,255,.7);
+  color: ${deb}; text-shadow: 0 -1px 1px rgba(43,31,20,.38), 0 1.5px 0 rgba(255,255,255,.92);
   font-size: 36px; line-height: 1.1;
 }
-${s} .brand { color: ${deb}; text-shadow: 0 1px 0 rgba(255,255,255,.7); }
-${s} .stat-num { color: ${deb}; text-shadow: 0 1px 0 rgba(255,255,255,.7); }
+${s} .brand { color: ${deb}; text-shadow: 0 -1px 1px rgba(43,31,20,.3), 0 1px 0 rgba(255,255,255,.88); }
+${s} .stat-num { color: ${deb}; text-shadow: 0 -1px 1px rgba(43,31,20,.35), 0 1.5px 0 rgba(255,255,255,.9); }
 ${s} .kicker { color: var(--muted); letter-spacing: .24em; }
 ${s} .topbar { border-bottom: 3px double var(--border); }
 ${s} .foot { border-top: 3px double var(--border); }
-${s} .card { background: var(--surface); border-color: var(--border); }
-${s} .card-t { text-align: center; color: ${deb}; text-shadow: 0 1px 0 rgba(255,255,255,.7); }
+${s} .card { background: var(--surface); border-color: var(--border); box-shadow: inset 0 1px 2px rgba(55,38,22,.1); }
+${s} .card-t { text-align: center; color: ${deb}; text-shadow: 0 -1px 1px rgba(43,31,20,.28), 0 1px 0 rgba(255,255,255,.9); }
 ${s} .card-t::after {
   content: "◆  ◆  ◆"; display: block; margin-top: 7px;
   font-size: 8px; color: var(--muted); letter-spacing: .1em; text-shadow: none;

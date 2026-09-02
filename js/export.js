@@ -35,8 +35,8 @@ export async function copyText(text) {
   }
 }
 
-export async function exportPng(g, filename, scale = 2) {
-  const { cls, html, css } = buildSample(g);
+export async function exportPng(g, filename, specimen = "brand", scale = 2) {
+  const { cls, html, css } = buildSample(g, specimen);
 
   // Build the full-size sample in a detached container, then serialize it as
   // well-formed XML for the SVG foreignObject.
@@ -44,7 +44,7 @@ export async function exportPng(g, filename, scale = 2) {
   holder.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
   holder.innerHTML =
     `<style>${SAMPLE_BASE}\n${css}</style>` +
-    `<div class="sample ${cls} export-mode">${html}</div>`;
+    `<div class="sample ${cls} specimen-${specimen} export-mode">${html}</div>`;
 
   const serialized = new XMLSerializer().serializeToString(holder);
   const svg =

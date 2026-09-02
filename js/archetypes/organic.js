@@ -165,6 +165,8 @@ ${s} .stat-delta { color: var(--accent); }
       g.density = "normal";
       g.case = "none"; g.hw = 700; g.track = 0;
       g.chart = "bars-outline";
+      g.chartTreatment = "rough";
+      g.chartGrid = "baseline";
     },
     css(s, g) {
       const wob1 = "255px 15px 225px 15px / 15px 225px 15px 255px";

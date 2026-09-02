@@ -96,7 +96,7 @@ ${s} .card-t {
 }
 ${s} .card { padding-left: 14px; padding-right: 14px; overflow: hidden; }
 ${s} .btn { ${raised} background: #c3c3c3; color: #141414; box-shadow: none; padding: 7px 16px; }
-${s} .btn-a { font-weight: 700; outline: 1px dotted #141414; outline-offset: -5px; }
+${s} .btn-a { background: #000080; color: #ffffff; font-weight: 700; outline: 1px dotted #ffffff; outline-offset: -5px; }
 ${s} .chip { ${sunken} background: #d6d6d6; border-radius: 0; }
 ${s} .display { font-size: 38px; }
 ${s} .kicker { color: #000080; }

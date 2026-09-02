@@ -95,10 +95,11 @@ ${s} .chart rect:nth-of-type(3n) { fill: var(--accent); }
       return `
 ${s} .hero { position: relative; }
 ${s} .hero::after {
-  content: ""; position: absolute; right: 0; top: -24px; width: 380px; height: 260px; z-index: -1;
+  content: ""; position: absolute; right: 0; top: -24px; width: 380px; height: 260px; z-index: 0;
   background: ${alpha(g.p.accent, 0.85)};
   clip-path: polygon(100% 0, 100% 100%, 0 0);
 }
+${s} .hero > * { position: relative; z-index: 1; }
 ${s} .smain { z-index: 2; }
 ${s} .kicker {
   align-self: flex-start; background: var(--accent); color: #ffffff;

@@ -75,7 +75,9 @@ ${s} .logo { border-radius: 50%; background: var(--ink); }
       g.shadow = "none"; g.texture = "paper";
       g.density = "dense";
       g.case = "upper"; g.hw = 700; g.track = 0;
-      g.chart = "bars-hatch";
+      g.chart = "bars";
+      g.chartTreatment = "crosshatch";
+      g.chartGrid = "baseline";
     },
     css(s, g) {
       return `
@@ -126,11 +128,16 @@ ${s} .logo { border-radius: 0; background: var(--ink); }
       g.density = "normal";
       g.case = among(r, g.case, ["none", "upper"]); g.hw = 800; g.track = 0;
       g.chart = among(r, g.chart, ["bars", "dots"]);
+      g.chartTreatment = "overprint";
     },
     css(s, g) {
       return `
 ${s} .display { text-shadow: 2.5px 2px 0 ${alpha(g.p.accent, 0.6)}; font-size: 48px; }
-${s} .card { box-shadow: 3px 3px 0 ${alpha(g.p.accent, 0.45)}; }
+${s} .card { box-shadow: 3px 3px 0 ${alpha(g.p.accent, 0.55)}; position: relative; }
+${s} .card::after {
+  content: ""; position: absolute; inset: -2px 2px 2px -2px; pointer-events: none;
+  border: 1.5px solid ${alpha(g.p.accent, 0.4)}; mix-blend-mode: multiply;
+}
 ${s} .chip { border-width: 2px; color: var(--ink); font-weight: 700; }
 ${s} .stat-num { color: var(--accent); text-shadow: 1.5px 1.5px 0 ${alpha(g.p.ink, 0.5)}; }
 ${s} .btn-b { border-width: 2px; }
@@ -167,6 +174,7 @@ ${s} .stat-delta { color: var(--ink); }
       g.density = "dense";
       g.case = "upper"; g.hw = 900; g.track = 0.01;
       g.chart = among(r, g.chart, ["bars-hatch", "bars-outline"]);
+      g.chartTreatment = "rough";
     },
     css(s, g) {
       return `
@@ -200,10 +208,10 @@ ${s} .logo { border-radius: 0; background: var(--ink); }
     blurb:
       "A scholarly manuscript page: warm parchment, old-style serif text, rubricated red initials and labels in the medieval tradition, fine double rules, and a burnished gold second accent. Antiquarian but disciplined.",
     notes: [
-      "The standfirst opens with a large rubricated (deep red) drop cap.",
+      "The standfirst opens with a large rubricated (deep red) drop cap set inside a small gold keyline.",
       "Labels and the kicker are set in red small-caps style (uppercase, spaced).",
-      "Frames are fine 3px double borders in the parchment-brown neutral.",
-      "Gold appears only in tiny touches (the mark, one chart series).",
+      "A visible illuminated frame and curling red/gold marginal vine distinguish the page from ordinary sepia editorial design.",
+      "Frames are fine 3px double borders in the parchment-brown neutral; gold appears only in tiny ornamental touches.",
     ],
     conform(g, r) {
       g.p = pal({
@@ -220,13 +228,28 @@ ${s} .logo { border-radius: 0; background: var(--ink); }
     css(s, g) {
       return `
 ${s} .card { border: 3px double var(--border); }
+${s} .smain { position: relative; border: 3px double var(--border); padding-inline: 18px; }
+${s} .smain::before {
+  content: "\\2766"; position: absolute; right: 7px; top: 58px; color: var(--accent2);
+  font-size: 26px; line-height: 1; text-shadow: 0 38px 0 var(--accent), 0 76px 0 var(--accent2);
+}
+${s} .hero { padding-right: 150px; position: relative; }
+${s} .hero::after {
+  content: ""; position: absolute; right: 18px; top: 4px; width: 105px; height: 78px;
+  border: 4px double var(--accent2); box-shadow: inset 0 0 0 3px var(--surface), inset 0 0 0 4px var(--accent);
+  background:
+    radial-gradient(circle at 50% 34%, var(--accent2) 0 7px, transparent 8px),
+    conic-gradient(from 45deg at 50% 65%, var(--accent) 0 25%, var(--surface2) 0 50%, var(--accent2) 0 75%, var(--surface) 0);
+  opacity: .86;
+}
 ${s} .topbar { border-bottom: 3px double var(--border); }
 ${s} .foot { border-top: 3px double var(--border); }
 ${s} .display { font-size: 46px; }
 ${s} .kicker { color: var(--accent); letter-spacing: .18em; }
 ${s} .sub::first-letter {
   font-family: var(--f-display); float: left; font-size: 44px; line-height: .8;
-  padding: 5px 8px 0 0; color: var(--accent); font-weight: 700;
+  padding: 5px 8px 2px; margin-right: 5px; color: var(--accent); font-weight: 700;
+  border: 1px solid var(--accent2); background: var(--surface);
 }
 ${s} .chip { border-color: var(--border); color: var(--accent); }
 ${s} .stat-num { color: var(--accent); }

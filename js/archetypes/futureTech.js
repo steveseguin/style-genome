@@ -212,6 +212,7 @@ ${s} .foot { border-top-color: ${alpha(c, 0.25)}; color: ${alpha(c, 0.55)}; }
         bg: "#0a1428", ink: "#e8eef7", accent: amber, accent2: "#c07f1e",
         surface: "#0e1b33", surface2: "#132340", border: "#25334d", muted: "#8598b5", dark: true,
       });
+      g.p.positive = "#4caf50";
       g.fonts = { display: "mono", body: "mono", mono: "mono" };
       g.radius = 0; g.ctl = 0; g.bw = 1;
       g.shadow = "none"; g.texture = among(r, g.texture, ["none", "grid"]);
@@ -220,7 +221,7 @@ ${s} .foot { border-top-color: ${alpha(c, 0.25)}; color: ${alpha(c, 0.55)}; }
       g.chart = "bars";
     },
     css(s, g) {
-      const green = "#4caf50";
+      const green = g.p.positive;
       return `
 ${s} .card {
   background: var(--surface);

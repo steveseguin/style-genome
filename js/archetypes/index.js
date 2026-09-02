@@ -1,5 +1,8 @@
 import { modernist } from "./modernist.js";
 import { print } from "./print.js";
+import { printProcesses } from "./printProcesses.js";
+import { movementGaps } from "./movementGaps.js";
+import { uiSystemGaps } from "./uiSystemGaps.js";
 import { retro } from "./retro.js";
 import { soft } from "./soft.js";
 import { bold } from "./bold.js";
@@ -16,7 +19,8 @@ import { atmos } from "./atmos.js";
 import { popPack } from "./popPack.js";
 
 export const ARCHETYPE_LIST = [
-  ...modernist, ...print, ...retro, ...soft, ...bold, ...organic,
+  ...modernist, ...print, ...printProcesses, ...movementGaps, ...uiSystemGaps,
+  ...retro, ...soft, ...bold, ...organic,
   ...craftTactile, ...craftPrint, ...webUtil, ...webRetro,
   ...futureTech, ...futureSpace, ...heritageModern, ...heritageClassic,
   ...atmos, ...popPack,

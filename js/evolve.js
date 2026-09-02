@@ -8,7 +8,7 @@
 //   mode/energy filter always outranks rejection-avoidance).
 
 import { ARCHETYPES, ARCHETYPE_IDS, relatedArchetypes } from "./archetypes/index.js";
-import { randomGenome, cloneGenome, genomeKey, genomeGenesLabel } from "./genome.js";
+import { randomGenome, randomGeneGenome, cloneGenome, genomeKey, genomeGenesLabel, GENE_KEYS } from "./genome.js";
 import { hexToHsl } from "./color.js";
 import { fontClass } from "./fonts.js";
 import { pick, chance, shuffle, mulberry32 } from "./rng.js";
@@ -24,12 +24,21 @@ function features(g) {
     dark: g.p.dark ? 1 : 0,
     hueBucket: Math.round(accent.h / 45) % 8,
     satBucket: accent.s > 65 ? 2 : accent.s > 30 ? 1 : 0,
+    displayKey: g.fonts.display,
     displayCls: fontClass(g.fonts.display),
+    bodyCls: fontClass(g.fonts.body),
     radiusBucket: g.radius === 0 ? 0 : g.radius <= 8 ? 1 : g.radius <= 16 ? 2 : 3,
+    controlBucket: g.ctl === 999 ? 4 : g.ctl === 0 ? 0 : g.ctl <= 6 ? 1 : g.ctl <= 12 ? 2 : 3,
+    borderBucket: g.bw || 0,
     shadow: g.shadow,
-    texture: g.texture === "none" ? 0 : 1,
+    texture: g.texture,
     density: g.density,
     caseStyle: g.case,
+    weightBucket: Math.round((g.hw || 400) / 200),
+    trackBucket: Math.round((g.track || 0) * 50),
+    chart: g.chart,
+    chartTreatment: g.chartTreatment || "auto",
+    chartGrid: g.chartGrid || "auto",
   };
 }
 
@@ -43,11 +52,20 @@ export function dist(a, b) {
   d += hueDiff * 0.5;
   if (fa.satBucket !== fb.satBucket) d += 0.75;
   if (fa.displayCls !== fb.displayCls) d += 1.5;
+  else if (fa.displayKey !== fb.displayKey) d += 0.45;
+  if (fa.bodyCls !== fb.bodyCls) d += 0.65;
   d += Math.abs(fa.radiusBucket - fb.radiusBucket) * 0.5;
+  d += Math.abs(fa.controlBucket - fb.controlBucket) * 0.25;
+  d += Math.abs(fa.borderBucket - fb.borderBucket) * 0.2;
   if (fa.shadow !== fb.shadow) d += 1;
-  if (fa.texture !== fb.texture) d += 0.5;
+  if (fa.texture !== fb.texture) d += 0.65;
   if (fa.density !== fb.density) d += 0.5;
   if (fa.caseStyle !== fb.caseStyle) d += 0.5;
+  d += Math.min(Math.abs(fa.weightBucket - fb.weightBucket), 2) * 0.2;
+  d += Math.min(Math.abs(fa.trackBucket - fb.trackBucket), 3) * 0.12;
+  if (fa.chart !== fb.chart) d += 0.35;
+  if (fa.chartTreatment !== fb.chartTreatment) d += 0.45;
+  if (fa.chartGrid !== fb.chartGrid) d += 0.2;
   return d;
 }
 
@@ -101,8 +119,11 @@ const labelKey = (g) => `${g.archetype}|${genomeGenesLabel(g)}`;
 // ------------------------------------------------- round 1: maximum spread
 
 export function diverseSet(r, n, isTaken, prefs) {
-  // Build a large candidate pool, then greedily pick the candidate whose
-  // nearest already-chosen neighbor is farthest (maximin / farthest-point).
+  // Build a large candidate pool. The first pass gives each available family
+  // one fair slot and chooses the archetype inside that family uniformly;
+  // maximin scoring then picks its strongest roll. This keeps a growing family
+  // (especially print) discoverable instead of letting its most extreme member
+  // monopolize the distance metric. A global maximin pass fills any spare slots.
   const pool = [];
   for (const id of shuffle(r, modeIds(prefs))) {
     for (let i = 0; i < 8; i++) {
@@ -126,9 +147,24 @@ export function diverseSet(r, n, isTaken, prefs) {
     labels.add(labelKey(c));
   };
 
-  for (const c of shuffle(r, pool)) {
-    if (accept(c, 1)) { take(c); break; }
+  const families = shuffle(r, [...new Set(pool.map((g) => ARCHETYPES[g.archetype].family))]);
+  for (const family of families) {
+    if (chosen.length >= n) break;
+    const familyPool = pool.filter((g) => ARCHETYPES[g.archetype].family === family && accept(g, 1));
+    const archetypeIds = [...new Set(familyPool.map((g) => g.archetype))];
+    if (!archetypeIds.length) continue;
+    const targetId = pick(r, archetypeIds);
+    const rolls = familyPool.filter((g) => g.archetype === targetId);
+    let best = null, bestScore = -1;
+    for (const candidate of rolls) {
+      const nearest = chosen.length
+        ? Math.min(...chosen.map((existing) => dist(candidate, existing)))
+        : r();
+      if (nearest > bestScore) { bestScore = nearest; best = candidate; }
+    }
+    if (best) take(best);
   }
+
   // Pass 1: unique archetypes. Pass 2 (only if the filtered pool is too thin,
   // e.g. "dark + calm"): allow a second roll of an archetype.
   for (const maxPerArch of [1, 2]) {
@@ -150,15 +186,23 @@ export function diverseSet(r, n, isTaken, prefs) {
 
 // ------------------------------------------- later rounds: guided neighbors
 
-// Re-run the raw gene sampler for a subset of genes, then re-conform.
+// Re-run the raw gene sampler for a subset of genes while preserving the
+// selected archetype's bespoke CSS identity.
 function mutate(r, base, rate) {
   const g = cloneGenome(base);
-  const fresh = randomGenome(r, g.archetype); // conformed random sibling
-  const genes = ["p", "fonts", "radius", "ctl", "bw", "shadow", "texture", "density", "case", "hw", "track", "chart"];
-  for (const gene of genes) {
-    if (chance(r, rate)) g[gene] = cloneGenome(fresh)[gene];
+  const fresh = randomGeneGenome(r, g.archetype);
+  for (const gene of GENE_KEYS) {
+    if (!chance(r, rate)) continue;
+    if (gene === "p") {
+      const standardRoles = new Set(["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border", "dark"]);
+      const customRoles = Object.fromEntries(Object.entries(g.p).filter(([key]) => !standardRoles.has(key)));
+      g.p = { ...cloneGenome(fresh.p), ...customRoles };
+    } else {
+      g[gene] = cloneGenome(fresh)[gene];
+    }
   }
-  ARCHETYPES[g.archetype].conform(g, r);
+  // The base archetype's bespoke CSS remains the identity. Re-conforming here
+  // would erase the variation and collapse fixed presets back into duplicates.
   return g;
 }
 
@@ -176,20 +220,33 @@ function cousin(r, base, rejectedArchs, prefs, likedArchs) {
   const pool = fresh.length ? fresh : exploring.length ? exploring : rel;
   const g = randomGenome(r, pick(r, pool));
   const carried = cloneGenome(base);
+  // Carry the complete standard palette promised by the picker while
+  // preserving target-archetype custom decor roles such as gold/paper3.
+  const standardRoles = new Set(["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border", "dark"]);
+  const targetDecor = Object.fromEntries(Object.entries(g.p).filter(([key]) => !standardRoles.has(key)));
+  g.p = { ...cloneGenome(carried.p), ...targetDecor };
   g.density = carried.density;
   g.chart = carried.chart;
-  ARCHETYPES[g.archetype].conform(g, r);
+  g.chartTreatment = carried.chartTreatment || "auto";
+  g.chartGrid = carried.chartGrid || "auto";
   return g;
 }
 
 function crossover(r, a, b) {
   const g = cloneGenome(chance(r, 0.5) ? a : b);
   const other = g.archetype === a.archetype ? b : a;
-  const genes = ["radius", "ctl", "shadow", "texture", "density", "case", "chart"];
-  for (const gene of genes) {
-    if (chance(r, 0.5)) g[gene] = cloneGenome(other)[gene];
+  for (const gene of GENE_KEYS) {
+    if (!chance(r, 0.5)) continue;
+    if (gene === "p") {
+      const standardRoles = new Set(["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border", "dark"]);
+      const baseDecor = Object.fromEntries(Object.entries(g.p).filter(([key]) => !standardRoles.has(key)));
+      g.p = { ...cloneGenome(other.p), ...baseDecor };
+    } else {
+      g[gene] = cloneGenome(other)[gene];
+    }
   }
-  ARCHETYPES[g.archetype].conform(g, r);
+  // Re-conforming would reset nearly every crossed gene. The base archetype's
+  // bespoke CSS remains the identity; the crossed token groups remain visible.
   return g;
 }
 

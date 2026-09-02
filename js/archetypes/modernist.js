@@ -228,6 +228,7 @@ ${s} .chip { background: var(--surface2); border-color: transparent; }
       g.shadow = "none"; g.texture = "none";
       g.density = "airy";
       g.case = "none"; g.hw = 500; g.track = 0;
+      g.chartGrid = "none";
       g.chart = among(r, g.chart, ["line", "dots"]);
     },
     css(s, g) {

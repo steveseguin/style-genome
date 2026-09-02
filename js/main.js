@@ -1,12 +1,16 @@
 import { diverseSet, neighborSet } from "./evolve.js";
-import { genomeKey, genomeName, genomeGenesLabel, SHADOWS, TEXTURES, DENSITIES, CHARTS, CASES } from "./genome.js";
+import {
+  genomeKey, genomeName, genomeGenesLabel, SHADOWS, TEXTURES, DENSITIES,
+  CHARTS, CHART_TREATMENTS, CHART_GRIDS, CASES,
+} from "./genome.js";
 import { sampleElement, SAMPLE_BASE, SAMPLE_W, tokensCss, buildSample } from "./render.js";
 import { buildPrompt } from "./prompt.js";
 import { exportPng, downloadText, copyText } from "./export.js";
 import { FONTS, FONT_KEYS, fontStack } from "./fonts.js";
 import { mulberry32 } from "./rng.js";
-import { onColor } from "./color.js";
+import { onColor, isDark } from "./color.js";
 import { shadowValues } from "./render.js";
+import { SPECIMENS } from "./specimens.js";
 
 const ROUNDS = 4;
 const GRID_N = 12;
@@ -20,6 +24,7 @@ const state = {
   liked: [],
   seen: new Set(),
   grid: [],
+  specimen: "brand",
   finalGenome: null,
   prefs: { mode: "any", energy: "any" },
   shownArchs: new Set(),   // archetypes the user has been shown…
@@ -39,6 +44,7 @@ const els = {
   finPreview: document.getElementById("fin-preview"),
   prompt: document.getElementById("prompttext"),
   note: document.getElementById("tb-note"),
+  specimenSelect: document.getElementById("specimen-select"),
 };
 
 // Style elements: base sample CSS once; per-screen genome CSS swapped in bulk.
@@ -67,8 +73,8 @@ function roundGenomes() {
   return [fav, ...fresh];
 }
 
-function renderRound() {
-  state.grid = roundGenomes();
+function renderRound({ reuseGrid = false } = {}) {
+  if (!reuseGrid) state.grid = roundGenomes();
   const favKey = state.liked.length ? genomeKey(state.liked[state.liked.length - 1]) : null;
 
   els.roundmsg.textContent = `Round ${state.round} of ${ROUNDS}`;
@@ -95,13 +101,11 @@ function renderRound() {
     const key = genomeKey(g);
     state.seen.add(key);
     state.shownArchs.add(g.archetype);
-    const { el, css: gCss } = sampleElement(g);
+    const { el, css: gCss } = sampleElement(g, state.specimen);
     css += gCss;
 
-    const tile = document.createElement("button");
-    tile.type = "button";
+    const tile = document.createElement("article");
     tile.className = "tile" + (favKey === key ? " tile-fav" : "");
-    tile.setAttribute("aria-label", `Choose style: ${genomeName(g)}`);
 
     const viewport = document.createElement("div");
     viewport.className = "tile-viewport";
@@ -109,13 +113,18 @@ function renderRound() {
 
     const caption = document.createElement("div");
     caption.className = "tile-caption";
+    const choose = document.createElement("button");
+    choose.type = "button";
+    choose.className = "tile-choose";
+    choose.setAttribute("aria-label", `Choose style: ${genomeName(g)}`);
     const name = document.createElement("span");
     name.className = "tile-name";
     name.textContent = genomeName(g);
     const genes = document.createElement("span");
     genes.className = "tile-genes";
     genes.textContent = genomeGenesLabel(g);
-    const use = document.createElement("span");
+    const use = document.createElement("button");
+    use.type = "button";
     use.className = "tile-usebtn";
     use.textContent = "Use now →";
     use.title = "Skip remaining rounds and open this style in the editor";
@@ -123,10 +132,12 @@ function renderRound() {
       ev.stopPropagation();
       enterFinale(g);
     });
-    caption.append(name, genes, use);
+    choose.append(name, genes);
+    choose.addEventListener("click", () => onPick(g));
+    caption.append(choose, use);
 
     tile.append(viewport, caption);
-    tile.addEventListener("click", () => onPick(g));
+    viewport.addEventListener("click", () => onPick(g));
     frag.appendChild(tile);
   });
 
@@ -162,11 +173,11 @@ function enterFinale(g) {
 
 function refreshFinale() {
   const g = state.finalGenome;
-  const { el, css } = sampleElement(g);
+  const { el, css } = sampleElement(g, state.specimen);
   finStyle.textContent = css;
   els.finPreview.innerHTML = "";
   els.finPreview.appendChild(el);
-  els.prompt.value = buildPrompt(g);
+  els.prompt.value = buildPrompt(g, state.specimen);
   applyTheme(g);
   requestAnimationFrame(scaleAll);
 }
@@ -192,7 +203,7 @@ function applyTheme(g) {
 // ------------------------------------------------------------------ editor
 
 const PALETTE_ROLES = [
-  ["bg", "Background"], ["surface", "Surface"], ["ink", "Ink (text)"],
+  ["bg", "Background"], ["surface", "Surface"], ["surface2", "Surface 2"], ["ink", "Ink (text)"],
   ["muted", "Muted text"], ["accent", "Accent"], ["accent2", "Accent 2"],
   ["border", "Borders"],
 ];
@@ -205,7 +216,11 @@ function buildEditor() {
   const palGroup = group("Palette");
   const swWrap = document.createElement("div");
   swWrap.className = "ed-swatches";
-  for (const [role, label] of PALETTE_ROLES) {
+  const standardRoles = new Set([...PALETTE_ROLES.map(([role]) => role), "dark"]);
+  const customRoles = Object.keys(g.p)
+    .filter((role) => !standardRoles.has(role))
+    .map((role) => [role, role.replace(/([a-z])([0-9])/g, "$1 $2").replace(/^./, (letter) => letter.toUpperCase())]);
+  for (const [role, label] of [...PALETTE_ROLES, ...customRoles]) {
     const row = document.createElement("label");
     row.className = "ed-swatch";
     const input = document.createElement("input");
@@ -219,6 +234,7 @@ function buildEditor() {
     hexEl.textContent = toHex6(g.p[role]);
     input.addEventListener("input", () => {
       state.finalGenome.p[role] = input.value;
+      if (role === "bg") state.finalGenome.p.dark = isDark(input.value);
       hexEl.textContent = input.value;
       refreshFinale();
     });
@@ -234,6 +250,9 @@ function buildEditor() {
   }, (k) => FONTS[k].label.split(" (")[0]));
   typeGroup.appendChild(selectRow("Body", FONT_KEYS.filter((k) => k !== "black"), g.fonts.body, (v) => {
     state.finalGenome.fonts.body = v; refreshFinale();
+  }, (k) => FONTS[k].label.split(" (")[0]));
+  typeGroup.appendChild(selectRow("Mono", FONT_KEYS.filter((k) => FONTS[k].cls === "mono"), g.fonts.mono, (v) => {
+    state.finalGenome.fonts.mono = v; refreshFinale();
   }, (k) => FONTS[k].label.split(" (")[0]));
   typeGroup.appendChild(selectRow("Weight", ["400", "500", "600", "700", "800", "900"], String(g.hw), (v) => {
     state.finalGenome.hw = Number(v); refreshFinale();
@@ -268,9 +287,15 @@ function buildEditor() {
 
   // --- data viz
   const vizGroup = group("Charts");
-  vizGroup.appendChild(selectRow("Style", CHARTS, g.chart, (v) => {
+  vizGroup.appendChild(selectRow("Geometry", CHARTS, g.chart, (v) => {
     state.finalGenome.chart = v; refreshFinale();
   }));
+  vizGroup.appendChild(selectRow("Treatment", CHART_TREATMENTS, g.chartTreatment || "auto", (v) => {
+    state.finalGenome.chartTreatment = v; refreshFinale();
+  }, (v) => v === "auto" ? "style default" : v));
+  vizGroup.appendChild(selectRow("Grid", CHART_GRIDS, g.chartGrid || "auto", (v) => {
+    state.finalGenome.chartGrid = v; refreshFinale();
+  }, (v) => v === "auto" ? "style default" : v));
 
   const note = document.createElement("p");
   note.className = "ed-note";
@@ -297,7 +322,12 @@ function selectRow(label, options, current, onChange, display) {
   const name = document.createElement("span");
   name.textContent = label;
   const sel = document.createElement("select");
-  for (const opt of options) {
+  // Preserve and expose valid archetype-specific values even when they are not
+  // part of the generic editor's suggested option set.
+  const actualOptions = options.some((opt) => String(opt) === String(current))
+    ? options
+    : [current, ...options];
+  for (const opt of actualOptions) {
     const o = document.createElement("option");
     o.value = opt;
     o.textContent = display ? display(opt) : opt;
@@ -344,7 +374,7 @@ document.getElementById("btn-png").addEventListener("click", async () => {
   if (!g) return;
   setNote("Rendering PNG…");
   try {
-    await exportPng(g, `style-${g.archetype}-${genomeKey(g)}.png`);
+    await exportPng(g, `style-${g.archetype}-${genomeKey(g)}-${state.specimen}.png`, state.specimen);
     setNote("PNG downloaded.");
   } catch (err) {
     setNote(`PNG export failed: ${err.message}`);
@@ -353,14 +383,14 @@ document.getElementById("btn-png").addEventListener("click", async () => {
 
 document.getElementById("btn-copyprompt").addEventListener("click", async () => {
   if (!state.finalGenome) return;
-  const ok = await copyText(buildPrompt(state.finalGenome));
+  const ok = await copyText(buildPrompt(state.finalGenome, state.specimen));
   setNote(ok ? "Prompt copied to clipboard." : "Copy failed — select the text below instead.");
 });
 
 document.getElementById("btn-dlprompt").addEventListener("click", () => {
   const g = state.finalGenome;
   if (!g) return;
-  downloadText(`style-${g.archetype}-${genomeKey(g)}.md`, buildPrompt(g), "text/markdown");
+  downloadText(`style-${g.archetype}-${genomeKey(g)}-${state.specimen}.md`, buildPrompt(g, state.specimen), "text/markdown");
   setNote("Prompt downloaded.");
 });
 
@@ -411,6 +441,21 @@ document.getElementById("restartbtn").addEventListener("click", () => {
   els.grid.hidden = false;
   renderRound();
   window.scrollTo({ top: 0, behavior: "instant" });
+});
+
+// Website structure is an inspection lens, not a taste gene. Switching it
+// keeps the exact same candidate genomes on screen.
+for (const specimen of SPECIMENS) {
+  const option = document.createElement("option");
+  option.value = specimen.id;
+  option.textContent = specimen.label;
+  els.specimenSelect.appendChild(option);
+}
+els.specimenSelect.value = state.specimen;
+els.specimenSelect.addEventListener("change", () => {
+  state.specimen = els.specimenSelect.value;
+  if (state.finalGenome) refreshFinale();
+  else renderRound({ reuseGrid: true });
 });
 
 // ----------------------------------------------------------------- scaling

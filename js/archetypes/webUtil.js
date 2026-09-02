@@ -86,7 +86,9 @@ ${s} .logo { border-radius: 3px; }
       g.shadow = "none"; g.texture = "none";
       g.density = "dense";
       g.case = "none"; g.hw = 700; g.track = 0;
-      g.chart = "bars-hatch";
+      g.chart = "bars";
+      g.chartTreatment = "crosshatch";
+      g.chartGrid = "baseline";
     },
     css(s, g) {
       return `

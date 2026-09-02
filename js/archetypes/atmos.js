@@ -42,8 +42,15 @@ ${s}::after {
   content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background: linear-gradient(115deg, transparent 30%, ${alpha("#ffffff", 0.05)} 42%, ${alpha("#ffffff", 0.09)} 50%, ${alpha("#ffffff", 0.05)} 58%, transparent 70%);
 }
+${s} .hero { position: relative; isolation: isolate; padding-left: 22px; }
+${s} .hero::before {
+  content: ""; position: absolute; inset: -12px 34% -10px -10px; z-index: -1;
+  background: linear-gradient(104deg, rgba(0,0,0,.82), rgba(0,0,0,.2) 58%, transparent 59%),
+    repeating-linear-gradient(168deg, transparent 0 18px, rgba(255,255,255,.035) 19px 22px);
+  clip-path: polygon(0 0, 100% 8%, 78% 100%, 0 88%);
+}
 ${s} .topbar, ${s} .smain, ${s} .foot { z-index: 2; }
-${s} .display { font-style: italic; font-weight: 400; font-size: 52px; line-height: 1.04; color: #f5f5f7; }
+${s} .display { font-style: italic; font-weight: 400; font-size: 52px; line-height: 1.04; color: #f5f5f7; max-width: 12ch; }
 ${s} .kicker { color: #b9bac0; letter-spacing: .25em; font-size: 10px; }
 ${s} .sub { color: var(--muted); }
 ${s} .card { border-color: var(--border); box-shadow: 0 18px 42px rgba(0,0,0,.62); }
