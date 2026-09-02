@@ -237,7 +237,7 @@ ${s} .hero > * { position: relative; z-index: 1; }
 ${s} .kicker { color: var(--accent); font-variant: small-caps; text-transform: none; letter-spacing: .3em; font-size: 12px; font-weight: 500; }
 ${s} .kicker::before { content: "✦ "; }
 ${s} .kicker::after { content: " ✦"; }
-${s} .display { font-size: 42px; letter-spacing: .12em; line-height: 1.15; }
+${s} .display { font-size: 36px; letter-spacing: .1em; line-height: 1.12; max-width: 18ch; }
 ${s} .card { border-color: var(--border); position: relative; }
 ${s} .card::before, ${s} .card::after { content: ""; position: absolute; width: 10px; height: 10px; border: 2px solid var(--border); pointer-events: none; }
 ${s} .card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }

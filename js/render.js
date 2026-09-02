@@ -153,7 +153,7 @@ export function sampleMarkup(g, uid, specimen = "brand") {
 
 // ------------------------------------------------------------------ tokens
 
-const SPACING = { airy: 12, normal: 9, dense: 7 };
+const SPACING = { airy: 11, normal: 9, dense: 7 };
 
 export function shadowValues(g) {
   const p = g.p;

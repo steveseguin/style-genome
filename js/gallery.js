@@ -96,14 +96,11 @@ document.getElementById("rerollbtn").addEventListener("click", () => {
   rerender();
 });
 
-const USE_ZOOM = typeof CSS !== "undefined" && CSS.supports && CSS.supports("zoom", "0.5");
 function scaleAll() {
   document.querySelectorAll(".tile-viewport").forEach((vp) => {
     const sample = vp.querySelector(".sample");
     if (!sample) return;
-    const scale = vp.clientWidth / SAMPLE_W;
-    if (USE_ZOOM) sample.style.zoom = scale;
-    else sample.style.transform = `scale(${scale})`;
+    sample.style.transform = `scale(${vp.clientWidth / SAMPLE_W})`;
   });
 }
 window.addEventListener("resize", scaleAll);

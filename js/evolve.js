@@ -145,6 +145,14 @@ function carryChartGenes(g, from) {
   }
 }
 
+// Warm light "paper" pages (cream, beige, khaki, parchment) and grain-type
+// textures are common enough in the catalog that a grid needs a cap on them.
+export function isCreamPage(g) {
+  const { h, s, l } = hexToHsl(g.p.bg);
+  return l >= 78 && s >= 8 && h >= 10 && h <= 65;
+}
+const isGrainy = (g) => ["grain", "paper", "fibers"].includes(g.texture);
+
 // A grid must never show two tiles that read identically: same archetype AND
 // same trait caption. (The caption includes the accent color word, so honest
 // re-rolls of an archetype still pass.)
@@ -170,13 +178,26 @@ export function diverseSet(r, n, isTaken, prefs) {
   const archCount = new Map();
   const labels = new Set();
   let patterned = 0;
-  const MAX_PATTERNED = 3; // the opening grid should not read as a print show
+  let cream = 0;
+  let textured = 0;
+  // The opening grid must read as twelve different worlds, not a print show
+  // or a stack of beige paper: cap patterned charts, warm cream/beige pages,
+  // and grain/paper textures. Nearly a third of the catalog lives on cream
+  // stock, so without a cap it dominates the light half of every grid.
+  const MAX_PATTERNED = 3;
+  const MAX_CREAM = prefs?.mode === "light" ? 5 : 3;
+  const MAX_TEXTURED = 3;
+  const MIN_DARK = prefs?.mode === "light" ? 0 : 5;
+  let dark = 0;
 
-  const accept = (c, maxPerArch) => {
+  const accept = (c, maxPerArch, relaxed = false) => {
     if (isTaken(genomeKey(c))) return false;
     if ((archCount.get(c.archetype) || 0) >= maxPerArch) return false;
     if (labels.has(labelKey(c))) return false;
+    if (relaxed) return true;
     if (patterned >= MAX_PATTERNED && isPatterned(c)) return false;
+    if (cream >= MAX_CREAM && isCreamPage(c)) return false;
+    if (textured >= MAX_TEXTURED && isGrainy(c)) return false;
     return true;
   };
   const take = (c) => {
@@ -184,6 +205,9 @@ export function diverseSet(r, n, isTaken, prefs) {
     archCount.set(c.archetype, (archCount.get(c.archetype) || 0) + 1);
     labels.add(labelKey(c));
     if (isPatterned(c)) patterned++;
+    if (isCreamPage(c)) cream++;
+    if (isGrainy(c)) textured++;
+    if (c.p.dark) dark++;
   };
 
   const families = shuffle(r, [...new Set(pool.map((g) => ARCHETYPES[g.archetype].family))]);
@@ -205,12 +229,18 @@ export function diverseSet(r, n, isTaken, prefs) {
   }
 
   // Pass 1: unique archetypes. Pass 2 (only if the filtered pool is too thin,
-  // e.g. "dark + calm"): allow a second roll of an archetype.
-  for (const maxPerArch of [1, 2]) {
+  // e.g. "dark + calm"): allow a second roll of an archetype. Pass 3 drops
+  // the mix caps so a constrained filter still fills the grid.
+  for (const [maxPerArch, relaxed] of [[1, false], [2, false], [2, true]]) {
     while (chosen.length < n) {
+      // Once the remaining slots are needed to reach the dark minimum, only
+      // dark candidates qualify (if the pool has any left).
+      const mustBeDark = !relaxed && dark < MIN_DARK && n - chosen.length <= MIN_DARK - dark
+        && pool.some((c) => c.p.dark && accept(c, maxPerArch));
       let best = null, bestScore = -1;
       for (const c of pool) {
-        if (!accept(c, maxPerArch)) continue;
+        if (mustBeDark && !c.p.dark) continue;
+        if (!accept(c, maxPerArch, relaxed)) continue;
         let nearest = Infinity;
         for (const ch of chosen) nearest = Math.min(nearest, dist(c, ch));
         if (nearest > bestScore) { bestScore = nearest; best = c; }

@@ -9,7 +9,7 @@ import { onColor } from "./color.js";
 import { shadowValues, textureCss } from "./render.js";
 import { motifsCss } from "./motifs.js";
 
-const SPACING = { airy: 12, normal: 9, dense: 7 };
+const SPACING = { airy: 11, normal: 9, dense: 7 };
 const STANDARD_ROLES = new Set(["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border", "dark"]);
 
 export function spacingUnit(g) {

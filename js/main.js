@@ -652,13 +652,10 @@ els.specimenSelect.addEventListener("change", () => {
 
 // ----------------------------------------------------------------- scaling
 
-// CSS zoom keeps 1px rules at least one device pixel wide at tile scale;
-// transform: scale() would blur hairlines into broken fragments on 1x displays.
-const USE_ZOOM = typeof CSS !== "undefined" && CSS.supports && CSS.supports("zoom", "0.5");
+// transform: scale() keeps the 860px layout exact (CSS zoom would trigger
+// Chrome's minimum font size and re-wrap text at tile scale).
 export function fitSample(vp, sample) {
-  const scale = vp.clientWidth / SAMPLE_W;
-  if (USE_ZOOM) sample.style.zoom = scale;
-  else sample.style.transform = `scale(${scale})`;
+  sample.style.transform = `scale(${vp.clientWidth / SAMPLE_W})`;
 }
 function scaleAll() {
   document.querySelectorAll(".tile-viewport, .fin-preview-wrap").forEach((vp) => {

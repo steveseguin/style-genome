@@ -14,7 +14,7 @@ export const NOISE_URI = `url("data:image/svg+xml,${encodeURIComponent(
 export const SAMPLE_BASE = `
 .sample {
   width: ${SAMPLE_W}px;
-  height: ${SAMPLE_H}px;
+  min-height: ${SAMPLE_H}px;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--f-body);
