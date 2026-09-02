@@ -64,8 +64,8 @@ export const MOTIFS = [
     note: "Faint concentric contour rings (two repeating radial gradients in the ink color at ≤8% opacity) ripple across the page background like topography.",
     css: (s, g) => `${s} { background-image: repeating-radial-gradient(circle at 78% 28%, transparent 0 22px, ${alpha(g.p.ink, 0.07)} 22px 23px), repeating-radial-gradient(circle at 14% 88%, transparent 0 30px, ${alpha(g.p.ink, 0.05)} 30px 31px); background-color: var(--bg); }` },
   { id: "gingham", slot: "backdrop", name: "Gingham check", fit: { mode: "light", like: ["warm", "friendly", "handmade", "playful"], avoid: ["minimal", "technical", "dark"] },
-    note: "The page background is a gingham check: two crossing repeating-linear-gradients in the accent at ~10% opacity with 18px cells.",
-    css: (s, g) => `${s} { background-image: repeating-linear-gradient(0deg, ${alpha(g.p.accent, 0.1)} 0 9px, transparent 9px 18px), repeating-linear-gradient(90deg, ${alpha(g.p.accent, 0.1)} 0 9px, transparent 9px 18px); background-color: var(--bg); }` },
+    note: "The page background is a gingham check: two crossing repeating-linear-gradients in the accent at ~7.5% opacity with 18px cells.",
+    css: (s, g) => `${s} { background-image: repeating-linear-gradient(0deg, ${alpha(g.p.accent, 0.075)} 0 9px, transparent 9px 18px), repeating-linear-gradient(90deg, ${alpha(g.p.accent, 0.075)} 0 9px, transparent 9px 18px); background-color: var(--bg); }` },
   { id: "confetti", slot: "backdrop", name: "Confetti dots", fit: { like: ["playful", "bold", "vivid", "pattern"], avoid: ["minimal", "elegant", "calm"] },
     note: "A scatter of three flat confetti dots in the accent colors sits in the background near the right edge (radial-gradient circles at fixed positions).",
     css: (s, g) => `${s} { background-image: radial-gradient(circle at 88% 12%, ${alpha(g.p.accent, 0.85)} 0 9px, transparent 10px), radial-gradient(circle at 94% 55%, ${alpha(g.p.accent2, 0.85)} 0 6px, transparent 7px), radial-gradient(circle at 72% 88%, ${alpha(g.p.accent, 0.75)} 0 5px, transparent 6px); background-color: var(--bg); }` },
@@ -73,11 +73,11 @@ export const MOTIFS = [
     note: "A sparse diagonal pinstripe (1px ink lines every 14px at -45°, ~5% opacity) covers the page background.",
     css: (s, g) => `${s} { background-image: repeating-linear-gradient(-45deg, ${alpha(g.p.ink, 0.05)} 0 1px, transparent 1px 14px); background-color: var(--bg); }` },
   { id: "glowcorner", slot: "backdrop", name: "Corner glow", fit: { like: ["modern", "soft", "neon", "dark", "gradient"], avoid: ["print", "historic"] },
-    note: "A soft radial glow in the accent color (~28% opacity fading to transparent) sits in the top-right corner of the page background.",
-    css: (s, g) => `${s} { background-image: radial-gradient(circle at 86% 8%, ${alpha(g.p.accent, 0.28)}, transparent 42%); background-color: var(--bg); }` },
+    note: "A soft radial glow in the accent color (~28% opacity on dark pages, ~12% on light) fades to transparent from the top-right corner of the page background.",
+    css: (s, g) => `${s} { background-image: radial-gradient(circle at 86% 8%, ${alpha(g.p.accent, g.p.dark ? 0.28 : 0.12)}, transparent 42%); background-color: var(--bg); }` },
   { id: "duoglow", slot: "backdrop", name: "Twin glows", fit: { like: ["modern", "soft", "neon", "gradient", "vivid"], avoid: ["print", "historic", "minimal"] },
     note: "Two soft radial glows — accent at the top-left, second accent at the bottom-right — tint opposite corners of the page background.",
-    css: (s, g) => `${s} { background-image: radial-gradient(circle at 8% 4%, ${alpha(g.p.accent, 0.22)}, transparent 40%), radial-gradient(circle at 96% 96%, ${alpha(g.p.accent2, 0.22)}, transparent 40%); background-color: var(--bg); }` },
+    css: (s, g) => `${s} { background-image: radial-gradient(circle at 8% 4%, ${alpha(g.p.accent, g.p.dark ? 0.22 : 0.1)}, transparent 40%), radial-gradient(circle at 96% 96%, ${alpha(g.p.accent2, g.p.dark ? 0.22 : 0.1)}, transparent 40%); background-color: var(--bg); }` },
   { id: "boardform", slot: "backdrop", name: "Board-form planks", fit: { like: ["raw", "gray", "natural", "texture"], avoid: ["soft", "elegant"] },
     note: "Vertical board-form grain — alternating 1px dark and light lines every 35px — runs down the page background.",
     css: (s, g) => `${s} { background-image: repeating-linear-gradient(90deg, rgba(0,0,0,.05) 0 1px, transparent 1px 34px, rgba(255,255,255,.06) 34px 35px, transparent 35px 70px); background-color: var(--bg); }` },
@@ -92,10 +92,10 @@ export const MOTIFS = [
     css: (s, g) => `${s} { background-image: radial-gradient(circle at 100% 0%, transparent 0 140px, var(--bg) 320px), radial-gradient(circle, ${alpha(g.p.ink, 0.18)} 0 1.4px, transparent 1.9px); background-size: auto, 9px 9px; background-color: var(--bg); }` },
   { id: "sunrays", slot: "backdrop", name: "Radiating rays", fit: { like: ["ornate", "retro", "bold", "elegant"], avoid: ["minimal", "technical"] },
     note: "Faint radiating rays (a repeating conic gradient in the accent at ~6% opacity) fan out from the top-right corner behind the content.",
-    css: (s, g) => `${s} { background-image: repeating-conic-gradient(from 200deg at 100% 0%, ${alpha(g.p.accent, 0.07)} 0deg 4deg, transparent 4deg 14deg); background-color: var(--bg); }` },
+    css: (s, g) => `${s} { background-image: repeating-conic-gradient(from 200deg at 100% 0%, ${alpha(g.p.accent, g.p.dark ? 0.07 : 0.045)} 0deg 4deg, transparent 4deg 14deg); background-color: var(--bg); }` },
   { id: "bottomwash", slot: "backdrop", name: "Bottom wash", fit: { like: ["soft", "natural", "calm", "airy"], avoid: ["print"] },
     note: "A soft elliptical wash of the second accent (~14% opacity) rises from the bottom center of the page background.",
-    css: (s, g) => `${s} { background-image: radial-gradient(ellipse at 50% 100%, ${alpha(g.p.accent2, 0.16)}, transparent 58%); background-color: var(--bg); }` },
+    css: (s, g) => `${s} { background-image: radial-gradient(ellipse at 50% 100%, ${alpha(g.p.accent2, g.p.dark ? 0.16 : 0.09)}, transparent 58%); background-color: var(--bg); }` },
 
   // ---------------------------------------------------------------- hero
   { id: "bigcircle", slot: "hero", name: "Big circle", fit: { like: ["geometric", "bold", "playful", "modern"], avoid: ["minimal", "historic"] },
@@ -371,7 +371,7 @@ function fits(motif, g, traits) {
 // most decorative slots are rarer so a design gains character, not clutter.
 function slotRate(slot, traits) {
   const quiet = traits.includes("minimal") || traits.includes("calm") || traits.includes("elegant");
-  const base = slot === "backdrop" || slot === "hero" ? 0.28 : 0.45;
+  const base = slot === "backdrop" ? 0.16 : slot === "hero" ? 0.24 : 0.45;
   return quiet ? base * 0.5 : base;
 }
 
