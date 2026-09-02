@@ -6,6 +6,7 @@ import { randomGenome, genomeGenesLabel } from "./genome.js";
 import { sampleElement, SAMPLE_BASE, SAMPLE_W } from "./render.js";
 import { mulberry32 } from "./rng.js";
 import { SPECIMENS } from "./specimens.js";
+import { genomeLink } from "./share.js";
 
 const r = mulberry32((Date.now() / 60000) | 0); // varies per minute, stable within it
 
@@ -65,7 +66,12 @@ function renderGallery(specimen = "brand", family = "all") {
     const genes = document.createElement("span");
     genes.className = "tile-genes";
     genes.textContent = `${arch.family} · ${genomeGenesLabel(g)}`;
-    caption.append(name, genes);
+    const open = document.createElement("a");
+    open.className = "tile-usebtn";
+    open.href = genomeLink(g, specimen, "index.html");
+    open.textContent = "Open in editor →";
+    open.title = "Tune and export this roll of the archetype";
+    caption.append(name, genes, open);
     tile.append(viewport, caption);
     frag.appendChild(tile);
   }

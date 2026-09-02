@@ -7,22 +7,27 @@ also render and prompt correctly across every specimen structure.
 
 ## Canonical coverage
 
-The registry currently contains 101 archetypes across 12 families:
+The registry currently contains 114 archetypes across 12 families:
 
 | Family | Count | Primary territory |
 |---|---:|---|
-| modernist | 6 | International, Bauhaus, reduction, data-ink |
-| print | 15 | Editorial plus relief, intaglio, planographic, screen, offset, and multi-block processes |
-| heritage | 16 | Historic ornament and major twentieth-century graphic movements |
-| retro | 7 | Screen eras, Y2K, Aero, vaporwave, and mid-century atomic |
-| soft | 6 | Glass, neumorphic, clay, pastel, mesh, and Scandinavian restraint |
-| bold | 8 | Brutal, Memphis, poster, toy, cyber, Deco, New Wave, and anti-design |
+| modernist | 7 | International, Bauhaus, reduction, data-ink, transit wayfinding |
+| print | 16 | Editorial plus relief, intaglio, planographic, screen, offset, multi-block processes, and wood-type broadsides |
+| heritage | 17 | Historic ornament, major twentieth-century graphic movements, and antique survey cartography |
+| retro | 9 | Screen eras, Y2K, Aero, vaporwave, mid-century atomic, handheld LCD, and split-flap boards |
+| soft | 7 | Glass, neumorphic, clay, pastel, mesh, Scandinavian restraint, and cottage gingham |
+| bold | 9 | Brutal, Memphis, poster, toy, cyber, Deco, New Wave, anti-design, and raw concrete |
 | organic | 6 | Earth, wabi-sabi, botanical, sketch, atelier, and industrial materiality |
-| craft | 8 | Paper, scrapbook, chalk, letterpress, glass, aggregate, and foil |
-| web | 13 | Docs, civic forms, raw HTML, historical web, skeuomorphic, Metro, Material, and Fluent UI |
-| future | 8 | Solar, mechanical, holographic, data, wireframe, polygonal, space, and bento systems |
-| atmos | 4 | Noir, academia, cassette instruments, and neon signage |
-| pop | 4 | Kawaii, rave, grunge, and cut-and-paste vernacular |
+| craft | 9 | Paper, scrapbook, chalk, letterpress, glass, aggregate, foil, and thermal receipts |
+| web | 14 | Docs, civic forms, raw HTML, historical web, skeuomorphic, Metro, Material, Fluent UI, and field manuals |
+| future | 10 | Solar, mechanical, holographic, data, wireframe, polygonal, space, bento, LCARS consoles, and circuit boards |
+| atmos | 5 | Noir, academia, cassette instruments, neon signage, and celestial almanacs |
+| pop | 5 | Kawaii, rave, grunge, cut-and-paste vernacular, and varsity athletics |
+
+Vernacular signage and document systems (`signage.js`) and object-derived
+worlds (`worlds.js`) are defined by a production constraint — one ink, one
+material, one grid — rather than a decorative motif, and each carries a
+signature device that survives every specimen structure.
 
 Print process coverage includes copperplate engraving, etching/aquatint,
 mezzotint, woodcut, linocut, stone lithography, screenprint, offset CMYK,
@@ -64,7 +69,11 @@ visual genome remains structure-independent.
 - Complete standard and custom palette serialization
 - Stable full-genome identity without collisions
 - Valid chart geometry/treatment/grid combinations
-- Exact craft CSS and selected structure contract in the generated prompt
+- Exact craft CSS, every signature note, the `:root` token block, the starter
+  stylesheet, and the selected structure contract in the generated prompt
+- A materially shorter compact prompt with continuous section numbering
+- A standalone stylesheet (tokens + starter + craft) and a lossless permalink
+  round-trip for every archetype
 - Rendering across all nine specimen structures
 - Reachability in the family-balanced discovery sampler
 - Genuine later-round variation even for formerly fixed presets

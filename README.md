@@ -5,11 +5,23 @@ webpage styles; you pick the one you like; each following round shows 11 unseen
 styles that share DNA with your picks, converging on your taste over 4 rounds.
 The winner opens an editor (palette, type, shape, texture, charts — all live),
 and every candidate can be inspected through nine real website/component structures.
-The final style exports three artifacts:
+The final style exports five artifacts:
 
+- **LLM prompt (.md)** — a spec any AI can rebuild the style from. It is ordered
+  for progressive fidelity: a plain-English summary, do/don't rules, and a
+  paste-ready `:root` token block come first (enough for a small model), then a
+  starter component stylesheet, the archetype's exact craft CSS with a class
+  glossary, the structure contract, and the genome (for a capable model). A
+  **compact** variant drops the code blocks for short-context models.
+- **Stylesheet (.css)** — tokens + starter components + craft CSS; add
+  `class="style-scope"` to `<body>` and it works without the prompt.
 - **PNG** — a pixel snapshot of the sample page in your style
-- **LLM prompt (.md)** — a precise natural-language spec any AI can rebuild the style from
 - **Genome (.json)** — the machine-readable encoding of the style
+- **Link** — the genome lives in the URL hash, so any style can be bookmarked,
+  shared, or reopened in the editor. **Import** reopens a saved .json or .md.
+
+Mis-clicked? **Back** undoes the last pick. **Re-roll** gives a fresh set of
+parameters for the same archetype.
 
 The point: AI-generated websites all converge on the same look. A few human
 gut-choices through a deliberately diverse style space land you somewhere
@@ -46,11 +58,13 @@ genome ──┬─► scoped CSS (what you see, live)
 
 A genome = **archetype × parameters**:
 
-- **Archetypes** (`js/archetypes/*.js`, 101 of them across 12 families and 19 registry modules) are
+- **Archetypes** (`js/archetypes/*.js`, 114 of them across 12 families and 21 registry modules) are
   hand-crafted design languages — Swiss Modern, Phosphor Terminal,
   Neo-Brutalist, Stained Glass, Art Deco, Riso Print, De Stijl, Film Noir,
   Copperplate Engraving, Mokuhanga, Dada, Arts & Crafts, Metro, Material,
-  Cassette Futurism, Geocities Revival, Kawaii, Bureaucracy… Each contributes
+  Cassette Futurism, Geocities Revival, Kawaii, Bureaucracy, LCARS Console,
+  Transit Wayfinding, Split-Flap Board, Thermal Receipt, Circuit Board,
+  Survey Map, Celestial Almanac, Béton Brut, Varsity Letterman… Each contributes
   bespoke CSS craft (heading treatments, card constructions, decorative
   motifs) plus constraints on the parameters.
 - **Parameters** are the continuous/enumerated genes: palette (8 role colors),
@@ -79,11 +93,18 @@ A genome = **archetype × parameters**:
   enforces a minimum style-distance from your current favorite so you never
   see a near-clone of it.
 
-### Export (`js/export.js`)
+### Export (`js/export.js`, `js/prompt.js`, `js/starter.js`, `js/share.js`)
 
 The PNG renders the exact selected structure, markup, and CSS you saw into an
 SVG `<foreignObject>`, rasterized to a 2× canvas. System font stacks mean no
 font embedding issues.
+
+The prompt and the stylesheet share one class contract (`.card`, `.btn-a`,
+`.kicker`, …): `starter.js` emits the `:root` tokens and a structure-agnostic
+baseline for those classes, and the archetype craft CSS layers on top of it, so
+tokens → starter → craft pasted into any project reproduces the style.
+`share.js` encodes a genome as base64url JSON in the URL hash and validates
+anything imported back in.
 
 ## Adding an archetype
 

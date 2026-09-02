@@ -65,24 +65,24 @@ body {
 @media (max-width: 720px) {
   .apphead-inner { flex-wrap: wrap; gap: 9px 13px; }
   .ah-structure { order: 3; width: 100%; }
-  .ah-link.ah-restart { margin-left: auto; }
+  .ah-actions { order: 4; width: 100%; margin-left: 0; }
 }
 
 .ah-link { text-decoration: none; display: inline-block; }
-.ah-link + .ah-restart { margin-left: 0; }
-.ah-link.ah-restart { margin-left: auto; }
+.ah-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
 .ah-restart {
-  margin-left: auto;
   font: inherit; font-size: 13px;
   color: var(--app-muted);
   background: transparent;
   border: 1px solid var(--app-border);
   border-radius: 7px;
   padding: 6px 13px;
-  cursor: default;
+  cursor: pointer;
 }
 .ah-restart:hover { color: var(--app-ink); border-color: var(--app-muted); }
+.ah-restart:focus-visible { outline: 2px solid #3e63dd; outline-offset: 2px; }
+.ah-restart[hidden] { display: none; }
 
 /* ------------------------------------------------- stage / intro */
 
@@ -163,6 +163,7 @@ body {
   flex-shrink: 0;
 }
 .tile-usebtn:hover { color: var(--app-ink); border-color: var(--app-muted); }
+a.tile-usebtn { text-decoration: none; white-space: nowrap; }
 
 /* ------------------------------------------------- finale */
 
@@ -243,6 +244,12 @@ body {
 
 .ed-note { font-size: 11.5px; color: var(--app-muted); line-height: 1.45; }
 
+/* finale header */
+
+.fin-head { margin: 2px 0 12px; }
+.fin-name { font-size: 21px; margin: 0 0 4px; letter-spacing: -0.01em; }
+.fin-blurb { margin: 0; color: var(--app-muted); font-size: 13.5px; line-height: 1.5; max-width: 84ch; }
+
 /* toolbar */
 
 .fin-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
@@ -278,6 +285,16 @@ body {
 .fin-prompt { margin-top: 18px; }
 .fin-prompt summary { cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--app-muted); }
 .fin-prompt summary:hover { color: var(--app-ink); }
+.prompt-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; margin-top: 10px; font-size: 12.5px; color: var(--app-muted); }
+.prompt-mode { display: flex; align-items: center; gap: 7px; }
+.prompt-mode span { text-transform: uppercase; letter-spacing: .06em; font-weight: 650; font-size: 11px; }
+.prompt-mode select {
+  font: inherit; font-size: 12.5px; color: var(--app-ink); background: var(--app-surface);
+  border: 1px solid var(--app-border); border-radius: 6px; padding: 5px 8px; max-width: 100%;
+}
+.prompt-meta { font-family: ui-monospace, Consolas, monospace; font-size: 11px; }
+.prompt-howto { font-size: 12.5px; color: var(--app-muted); line-height: 1.5; margin: 8px 0 0; max-width: 96ch; }
+.prompt-howto code { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--app-ink); }
 .fin-prompt textarea {
   width: 100%;
   height: 340px;
@@ -293,6 +310,28 @@ body {
   resize: vertical;
 }
 
+/* import dialog */
+
+.imp-dialog {
+  border: 1px solid var(--app-border); border-radius: 10px; padding: 0;
+  width: min(640px, 92vw); color: var(--app-ink); background: var(--app-surface);
+  box-shadow: 0 24px 60px rgba(0,0,0,.25);
+}
+.imp-dialog::backdrop { background: rgba(0,0,0,.45); }
+.imp-form { padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; margin: 0; }
+.imp-form h2 { margin: 0; font-size: 17px; }
+.imp-form p { margin: 0; color: var(--app-muted); font-size: 13px; line-height: 1.5; }
+.imp-form code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--app-ink); }
+.imp-form input[type="file"] { font: inherit; font-size: 12.5px; }
+.imp-form textarea {
+  width: 100%; height: 170px; resize: vertical;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12px; line-height: 1.5;
+  color: var(--app-ink); background: var(--app-bg); border: 1px solid var(--app-border); border-radius: 8px; padding: 10px;
+}
+.imp-error { color: #b3261e; font-size: 12.5px; }
+.imp-error[hidden] { display: none; }
+.imp-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+
 /* ---------------------------------------------------------------------------
    Themed mode: once a style is chosen, the app chrome adopts its tokens.
 --------------------------------------------------------------------------- */
@@ -303,7 +342,13 @@ body.themed {
   font-family: var(--f-body);
 }
 body.themed .apphead { background: var(--surface); border-bottom: var(--bw) solid var(--border); }
-body.themed .ah-name, body.themed .intro h1, body.themed .fin-h { font-family: var(--f-display); }
+body.themed .ah-name, body.themed .intro h1, body.themed .fin-h, body.themed .fin-name { font-family: var(--f-display); }
+body.themed .fin-blurb, body.themed .prompt-tools, body.themed .prompt-howto, body.themed .prompt-meta { color: var(--muted); }
+body.themed .prompt-howto code { color: var(--ink); }
+body.themed .prompt-mode select { background: var(--surface); color: var(--ink); border-color: var(--border); border-radius: var(--r-ctl); }
+body.themed .imp-dialog { background: var(--surface); color: var(--ink); border: var(--bw) solid var(--border); border-radius: var(--radius); }
+body.themed .imp-form p { color: var(--muted); }
+body.themed .imp-form textarea { background: var(--bg); color: var(--ink); border-color: var(--border); }
 body.themed .ah-mark { background: var(--accent); border-radius: var(--r-ctl); }
 body.themed .ah-round, body.themed .intro p, body.themed .tb-note,
 body.themed .ed-label, body.themed .ed-swatch .sw-hex, body.themed .ed-row .ed-val,

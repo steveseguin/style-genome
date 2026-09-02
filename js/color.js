@@ -126,3 +126,50 @@ export function colorName(hex) {
   for (const [limit, name] of HUE_WORDS) if (h <= limit) return name;
   return "Crimson";
 }
+
+// Plain-language color description for prompts aimed at any model, e.g.
+// "warm off-white", "off-white with a pink tint", "vivid pink", "deep brown",
+// "near-black", "muted deep teal". Uses chroma (not HSL saturation) so pale
+// tints are not called "vivid".
+const PLAIN_HUE = {
+  Crimson: "red", Amber: "orange", Gold: "yellow", Chartreuse: "yellow-green",
+  Emerald: "green", Teal: "teal", Azure: "blue", Indigo: "indigo blue",
+  Violet: "purple", Magenta: "magenta", Rose: "pink-red",
+};
+
+const TINT_WORD = {
+  red: "pink", "pink-red": "pink", magenta: "pink", orange: "peach", yellow: "cream",
+  "yellow-green": "green", "indigo blue": "blue", purple: "lavender",
+};
+
+export function describeColor(hex) {
+  const { h, s, l } = hexToHsl(hex);
+  const chroma = (s / 100) * (1 - Math.abs((2 * l) / 100 - 1));
+  const word = colorName(hex);
+  let hue = PLAIN_HUE[word] || "gray";
+  const warm = h >= 15 && h <= 75;
+  const cool = h >= 180 && h <= 270;
+  if (l >= 95 && chroma < 0.12) {
+    if (chroma >= 0.03) return `off-white with a ${TINT_WORD[hue] || hue} tint`;
+    return warm ? "warm off-white" : cool ? "cool off-white" : "off-white";
+  }
+  if (l <= 6) return "near-black";
+  if (chroma < 0.09) {
+    const tint = chroma >= 0.03 ? (warm ? "warm " : cool ? "cool " : "") : "";
+    if (l >= 88) return `very light ${tint}gray`;
+    if (l >= 62) return `light ${tint}gray`;
+    if (l >= 38) return `mid ${tint}gray`;
+    if (l >= 18) return `dark ${tint}gray`;
+    return "near-black gray";
+  }
+  // Friendlier names for common light/dark versions of a hue.
+  if ((word === "Rose" || word === "Magenta" || word === "Crimson") && l >= 58) hue = "pink";
+  if (word === "Amber" && l >= 72) hue = "peach";
+  if ((word === "Amber" || word === "Gold" || word === "Crimson") && l < 42 && chroma < 0.5 && h >= 12 && h <= 50) hue = "brown";
+  if (word === "Gold" && l < 70 && chroma < 0.7) hue = "gold";
+  if (word === "Azure" && l >= 70) hue = "sky blue";
+  if (word === "Indigo" && l < 30) hue = "navy";
+  const light = l >= 88 ? "very pale " : l >= 74 ? "pale " : l >= 58 ? "light " : l >= 40 ? "" : l >= 22 ? "deep " : "very dark ";
+  const sat = chroma >= 0.55 ? "vivid " : chroma >= 0.22 ? "" : "muted ";
+  return `${light}${sat}${hue}`.replace(/\s+/g, " ").trim();
+}

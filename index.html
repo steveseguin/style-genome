@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Style Genome — Discover Your Visual Design Style</title>
-<meta name="description" content="Discover your visual design style through four quick rounds, then customize it and export a reusable AI prompt, style genome, or PNG.">
+<meta name="description" content="Discover your visual design style in four quick rounds, tune it, then export an AI prompt any model can follow, a ready-to-use stylesheet, a PNG, and a shareable link.">
 <meta name="author" content="Steve Seguin">
 <meta name="creator" content="Steve Seguin">
 <meta name="application-name" content="Style Genome">
@@ -16,11 +16,11 @@
 <meta property="og:site_name" content="Style Genome">
 <meta property="og:locale" content="en_CA">
 <meta property="og:title" content="Style Genome — Discover Your Visual Design Style">
-<meta property="og:description" content="Find a visual style that feels like you, customize it, and export it for your next creative project.">
+<meta property="og:description" content="Find a visual style that feels like you, customize it, and export it as an AI prompt, a stylesheet, a PNG, or a link.">
 <meta property="og:url" content="https://style-genome.com/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Style Genome — Discover Your Visual Design Style">
-<meta name="twitter:description" content="Find a visual style that feels like you, customize it, and export it for your next creative project.">
+<meta name="twitter:description" content="Find a visual style that feels like you, customize it, and export it as an AI prompt, a stylesheet, a PNG, or a link.">
 <link rel="stylesheet" href="css/app.css">
 <script type="application/ld+json">
 {
@@ -28,7 +28,7 @@
   "@type": "WebApplication",
   "name": "Style Genome",
   "url": "https://style-genome.com/",
-  "description": "An interactive taste-discovery tool for finding, customizing, and exporting a visual design style.",
+  "description": "An interactive taste-discovery tool for finding, customizing, and exporting a visual design style as an AI prompt, stylesheet, image, or link.",
   "applicationCategory": "DesignApplication",
   "operatingSystem": "Any",
   "isAccessibleForFree": true,
@@ -48,8 +48,12 @@
         <span>Preview as</span>
         <select id="specimen-select" aria-label="Website structure preview"></select>
       </label>
-      <a class="ah-restart ah-link" href="gallery.html" title="Browse every archetype">Gallery</a>
-      <button class="ah-restart" id="restartbtn" type="button" title="Start over with a fresh set">Start over</button>
+      <div class="ah-actions">
+        <a class="ah-restart ah-link" href="gallery.html" title="Browse every archetype">Gallery</a>
+        <button class="ah-restart" id="importbtn" type="button" title="Reopen a saved genome .json or prompt .md">Import</button>
+        <button class="ah-restart" id="backbtn" type="button" title="Undo the last pick" hidden>← Back</button>
+        <button class="ah-restart" id="restartbtn" type="button" title="Start over with a fresh set">Start over</button>
+      </div>
     </div>
   </header>
 
@@ -80,23 +84,59 @@
         <div id="editor-controls"></div>
       </aside>
       <div class="fin-main">
+        <div class="fin-head">
+          <h2 class="fin-name" id="fin-name"></h2>
+          <p class="fin-blurb" id="fin-blurb"></p>
+        </div>
         <div class="fin-toolbar">
-          <button type="button" class="tb-btn tb-primary" id="btn-png">Download PNG</button>
-          <button type="button" class="tb-btn" id="btn-copyprompt">Copy LLM prompt</button>
-          <button type="button" class="tb-btn" id="btn-dlprompt">Download prompt (.md)</button>
-          <button type="button" class="tb-btn" id="btn-dljson">Download genome (.json)</button>
-          <span class="tb-note" id="tb-note"></span>
+          <button type="button" class="tb-btn tb-primary" id="btn-copyprompt" title="Copy the prompt for any AI model">Copy LLM prompt</button>
+          <button type="button" class="tb-btn" id="btn-png" title="Pixel snapshot of the preview">Download PNG</button>
+          <button type="button" class="tb-btn" id="btn-dlprompt" title="The prompt as a Markdown file">Prompt (.md)</button>
+          <button type="button" class="tb-btn" id="btn-dlcss" title="Tokens + starter components + archetype craft CSS">Stylesheet (.css)</button>
+          <button type="button" class="tb-btn" id="btn-dljson" title="The machine-readable style genome">Genome (.json)</button>
+          <button type="button" class="tb-btn" id="btn-copylink" title="A link that reopens this exact style">Copy link</button>
+          <button type="button" class="tb-btn" id="btn-reroll" title="A fresh roll of this archetype's parameters">Re-roll</button>
+          <span class="tb-note" id="tb-note" aria-live="polite"></span>
         </div>
         <div class="fin-preview-wrap" id="fin-preview-wrap">
           <div class="fin-preview" id="fin-preview"></div>
         </div>
         <details class="fin-prompt" open>
           <summary>LLM prompt — hand this to any AI to reproduce the style</summary>
-          <textarea id="prompttext" readonly spellcheck="false"></textarea>
+          <div class="prompt-tools">
+            <label class="prompt-mode">
+              <span>Length</span>
+              <select id="prompt-mode" aria-label="Prompt length">
+                <option value="full">Full spec — best for capable models</option>
+                <option value="compact">Compact brief — small models or short context</option>
+              </select>
+            </label>
+            <span class="prompt-meta" id="prompt-meta"></span>
+          </div>
+          <p class="prompt-howto">
+            Paste it into your AI tool with the instruction “Build my project in exactly this visual style”, and attach the PNG if the model accepts images.
+            The full spec front-loads a plain-English summary, do/don't rules, and paste-ready CSS tokens so even a small model lands on the right look; the later sections give a capable model the exact craft CSS and structure contract.
+            The .css download also works on its own: add <code>class="style-scope"</code> to <code>&lt;body&gt;</code> and link it.
+          </p>
+          <textarea id="prompttext" readonly spellcheck="false" aria-label="Generated LLM prompt"></textarea>
         </details>
       </div>
     </section>
   </main>
+
+  <dialog class="imp-dialog" id="import-dialog" aria-labelledby="import-title">
+    <form method="dialog" class="imp-form">
+      <h2 id="import-title">Import a style genome</h2>
+      <p>Paste the genome JSON — from a downloaded <code>.json</code>, or the block at the end of a prompt <code>.md</code> — or choose the file. It opens in the editor exactly as it was saved.</p>
+      <input type="file" id="import-file" accept=".json,.md,.txt,application/json,text/markdown,text/plain" aria-label="Genome or prompt file">
+      <textarea id="import-text" placeholder='{ "archetype": "swiss", "p": { … }, … }' spellcheck="false" aria-label="Genome JSON"></textarea>
+      <p class="imp-error" id="import-error" hidden></p>
+      <div class="imp-actions">
+        <button type="button" class="tb-btn" id="import-cancel">Cancel</button>
+        <button type="button" class="tb-btn tb-primary" id="import-load">Open in editor</button>
+      </div>
+    </form>
+  </dialog>
 
   <script type="module" src="js/main.js"></script>
 </body>

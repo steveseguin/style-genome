@@ -174,7 +174,7 @@ export function shadowValues(g) {
   }
 }
 
-function textureCss(g, s) {
+export function textureCss(g, s) {
   const p = g.p;
   switch (g.texture) {
     case "grain":

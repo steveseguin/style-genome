@@ -17,13 +17,15 @@ import { heritageModern } from "./heritageModern.js";
 import { heritageClassic } from "./heritageClassic.js";
 import { atmos } from "./atmos.js";
 import { popPack } from "./popPack.js";
+import { signage } from "./signage.js";
+import { worlds } from "./worlds.js";
 
 export const ARCHETYPE_LIST = [
   ...modernist, ...print, ...printProcesses, ...movementGaps, ...uiSystemGaps,
   ...retro, ...soft, ...bold, ...organic,
   ...craftTactile, ...craftPrint, ...webUtil, ...webRetro,
   ...futureTech, ...futureSpace, ...heritageModern, ...heritageClassic,
-  ...atmos, ...popPack,
+  ...atmos, ...popPack, ...signage, ...worlds,
 ];
 
 export const ARCHETYPES = Object.fromEntries(ARCHETYPE_LIST.map((a) => [a.id, a]));

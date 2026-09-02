@@ -1,16 +1,18 @@
 import { diverseSet, neighborSet } from "./evolve.js";
 import {
-  genomeKey, genomeName, genomeGenesLabel, SHADOWS, TEXTURES, DENSITIES,
+  genomeKey, genomeName, genomeGenesLabel, randomGenome, SHADOWS, TEXTURES, DENSITIES,
   CHARTS, CHART_TREATMENTS, CHART_GRIDS, CASES,
 } from "./genome.js";
-import { sampleElement, SAMPLE_BASE, SAMPLE_W, tokensCss, buildSample } from "./render.js";
+import { sampleElement, SAMPLE_W, shadowValues } from "./render.js";
 import { buildPrompt } from "./prompt.js";
 import { exportPng, downloadText, copyText } from "./export.js";
 import { FONTS, FONT_KEYS, fontStack } from "./fonts.js";
 import { mulberry32 } from "./rng.js";
 import { onColor, isDark } from "./color.js";
-import { shadowValues } from "./render.js";
-import { SPECIMENS } from "./specimens.js";
+import { SPECIMENS, SPECIMEN_IDS } from "./specimens.js";
+import { ARCHETYPES } from "./archetypes/index.js";
+import { fullStylesheet } from "./starter.js";
+import { genomeLink, parseHash, normalizeGenome } from "./share.js";
 
 const ROUNDS = 4;
 const GRID_N = 12;
@@ -29,6 +31,8 @@ const state = {
   prefs: { mode: "any", energy: "any" },
   shownArchs: new Set(),   // archetypes the user has been shown…
   likedArchs: new Set(),   // …and the ones they actually picked
+  history: [],             // snapshots for "Back" (one per pick)
+  promptMode: "full",
 };
 
 const els = {
@@ -42,12 +46,22 @@ const els = {
   editor: document.getElementById("editor-controls"),
   finPreviewWrap: document.getElementById("fin-preview-wrap"),
   finPreview: document.getElementById("fin-preview"),
+  finName: document.getElementById("fin-name"),
+  finBlurb: document.getElementById("fin-blurb"),
   prompt: document.getElementById("prompttext"),
+  promptMode: document.getElementById("prompt-mode"),
+  promptMeta: document.getElementById("prompt-meta"),
   note: document.getElementById("tb-note"),
   specimenSelect: document.getElementById("specimen-select"),
+  backbtn: document.getElementById("backbtn"),
+  importDialog: document.getElementById("import-dialog"),
+  importText: document.getElementById("import-text"),
+  importFile: document.getElementById("import-file"),
+  importError: document.getElementById("import-error"),
 };
 
 // Style elements: base sample CSS once; per-screen genome CSS swapped in bulk.
+import { SAMPLE_BASE } from "./render.js";
 const baseStyle = document.createElement("style");
 baseStyle.textContent = SAMPLE_BASE;
 document.head.appendChild(baseStyle);
@@ -59,6 +73,33 @@ const finStyle = document.createElement("style");
 document.head.appendChild(finStyle);
 
 const isTaken = (key) => state.seen.has(key);
+
+// ----------------------------------------------------------------- history
+
+function snapshot() {
+  return {
+    round: state.round,
+    grid: state.grid,
+    liked: state.liked.slice(),
+    seen: new Set(state.seen),
+    shownArchs: new Set(state.shownArchs),
+    likedArchs: new Set(state.likedArchs),
+    finalGenome: state.finalGenome ? JSON.parse(JSON.stringify(state.finalGenome)) : null,
+  };
+}
+
+function restore(snap) {
+  state.round = snap.round;
+  state.grid = snap.grid;
+  state.liked = snap.liked;
+  state.seen = snap.seen;
+  state.shownArchs = snap.shownArchs;
+  state.likedArchs = snap.likedArchs;
+}
+
+function updateBackButton() {
+  els.backbtn.hidden = state.history.length === 0;
+}
 
 // ------------------------------------------------------------------ rounds
 
@@ -82,7 +123,7 @@ function renderRound({ reuseGrid = false } = {}) {
   if (state.round === 1) {
     els.introtitle.textContent = "Pick the one that draws you in.";
     els.introsub.textContent =
-      "Twelve deliberately different directions. Don't overthink it — go with your gut. Each round narrows in on your taste.";
+      "Twelve deliberately different directions. Don't overthink it — go with your gut. Each round narrows in on your taste, and the winner becomes a prompt any AI can follow, a stylesheet, a PNG, and a link.";
   } else if (state.round < ROUNDS) {
     els.introtitle.textContent = "Getting warmer — pick again.";
     els.introsub.textContent =
@@ -130,6 +171,7 @@ function renderRound({ reuseGrid = false } = {}) {
     use.title = "Skip remaining rounds and open this style in the editor";
     use.addEventListener("click", (ev) => {
       ev.stopPropagation();
+      state.history.push(snapshot());
       enterFinale(g);
     });
     choose.append(name, genes);
@@ -143,10 +185,12 @@ function renderRound({ reuseGrid = false } = {}) {
 
   gridStyle.textContent = css;
   els.grid.appendChild(frag);
+  updateBackButton();
   requestAnimationFrame(scaleAll);
 }
 
 function onPick(g) {
+  state.history.push(snapshot());
   state.liked.push(g);
   state.likedArchs.add(g.archetype);
   if (state.round >= ROUNDS) {
@@ -155,6 +199,28 @@ function onPick(g) {
   }
   state.round += 1;
   renderRound();
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+// Undo the last step: a pick returns to the previous grid; a re-roll or
+// import from the editor returns to the previous genome in the editor.
+function goBack() {
+  const snap = state.history.pop();
+  if (!snap) return;
+  restore(snap);
+  state.finalGenome = null;
+  if (snap.finalGenome) {
+    enterFinale(snap.finalGenome);
+    return;
+  }
+  document.body.classList.remove("themed");
+  document.body.removeAttribute("style");
+  history.replaceState(null, "", location.pathname + location.search);
+  els.finale.hidden = true;
+  els.intro.hidden = false;
+  els.grid.hidden = false;
+  if (state.grid.length) renderRound({ reuseGrid: true });
+  else renderRound();
   window.scrollTo({ top: 0, behavior: "instant" });
 }
 
@@ -168,18 +234,35 @@ function enterFinale(g) {
   els.roundmsg.textContent = "Your style — tune it, then export";
   buildEditor();
   refreshFinale();
+  updateBackButton();
   window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+function currentPrompt() {
+  return buildPrompt(state.finalGenome, state.specimen, { mode: state.promptMode });
 }
 
 function refreshFinale() {
   const g = state.finalGenome;
+  const a = ARCHETYPES[g.archetype];
   const { el, css } = sampleElement(g, state.specimen);
   finStyle.textContent = css;
   els.finPreview.innerHTML = "";
   els.finPreview.appendChild(el);
-  els.prompt.value = buildPrompt(g, state.specimen);
+  els.finName.textContent = `${a.name} · ${genomeGenesLabel(g)}`;
+  els.finBlurb.textContent = a.blurb;
+  refreshPrompt();
   applyTheme(g);
+  // Keep the URL a permalink to exactly what is on screen.
+  history.replaceState(null, "", genomeLink(g, state.specimen, location.pathname + location.search));
   requestAnimationFrame(scaleAll);
+}
+
+function refreshPrompt() {
+  const text = currentPrompt();
+  els.prompt.value = text;
+  const words = text.split(/\s+/).filter(Boolean).length;
+  els.promptMeta.textContent = `${text.split("\n").length} lines · ~${Math.round(words * 1.35).toLocaleString()} tokens`;
 }
 
 function applyTheme(g) {
@@ -300,7 +383,7 @@ function buildEditor() {
   const note = document.createElement("p");
   note.className = "ed-note";
   note.textContent =
-    "Every change updates the preview, this whole page, and the LLM prompt below — they all derive from the same style genome.";
+    "Every change updates the preview, this whole page, the prompt, the stylesheet, and the link in your address bar — they all derive from the same style genome.";
 
   els.editor.append(palGroup, typeGroup, shapeGroup, vizGroup, note);
 
@@ -369,12 +452,14 @@ function toHex6(c) {
 
 // ----------------------------------------------------------------- exports
 
+const styleId = (g) => `style-${g.archetype}-${genomeKey(g)}`;
+
 document.getElementById("btn-png").addEventListener("click", async () => {
   const g = state.finalGenome;
   if (!g) return;
   setNote("Rendering PNG…");
   try {
-    await exportPng(g, `style-${g.archetype}-${genomeKey(g)}-${state.specimen}.png`, state.specimen);
+    await exportPng(g, `${styleId(g)}-${state.specimen}.png`, state.specimen);
     setNote("PNG downloaded.");
   } catch (err) {
     setNote(`PNG export failed: ${err.message}`);
@@ -383,30 +468,107 @@ document.getElementById("btn-png").addEventListener("click", async () => {
 
 document.getElementById("btn-copyprompt").addEventListener("click", async () => {
   if (!state.finalGenome) return;
-  const ok = await copyText(buildPrompt(state.finalGenome, state.specimen));
-  setNote(ok ? "Prompt copied to clipboard." : "Copy failed — select the text below instead.");
+  const ok = await copyText(currentPrompt());
+  setNote(ok ? `${state.promptMode === "compact" ? "Compact" : "Full"} prompt copied to clipboard.` : "Copy failed — select the text below instead.");
 });
 
 document.getElementById("btn-dlprompt").addEventListener("click", () => {
   const g = state.finalGenome;
   if (!g) return;
-  downloadText(`style-${g.archetype}-${genomeKey(g)}-${state.specimen}.md`, buildPrompt(g, state.specimen), "text/markdown");
+  const suffix = state.promptMode === "compact" ? "-compact" : "";
+  downloadText(`${styleId(g)}-${state.specimen}${suffix}.md`, currentPrompt(), "text/markdown");
   setNote("Prompt downloaded.");
+});
+
+document.getElementById("btn-dlcss").addEventListener("click", () => {
+  const g = state.finalGenome;
+  if (!g) return;
+  const id = `${g.archetype}-${genomeKey(g)}`;
+  downloadText(`${styleId(g)}.css`, fullStylesheet(g, ARCHETYPES[g.archetype], id), "text/css");
+  setNote("Stylesheet downloaded — add class=\"style-scope\" to <body> and link it.");
 });
 
 document.getElementById("btn-dljson").addEventListener("click", () => {
   const g = state.finalGenome;
   if (!g) return;
-  downloadText(`style-${g.archetype}-${genomeKey(g)}.json`, JSON.stringify(g, null, 2), "application/json");
+  downloadText(`${styleId(g)}.json`, JSON.stringify(g, null, 2), "application/json");
   setNote("Genome downloaded.");
+});
+
+document.getElementById("btn-copylink").addEventListener("click", async () => {
+  const g = state.finalGenome;
+  if (!g) return;
+  const url = location.href.split("#")[0] + genomeLink(g, state.specimen);
+  const ok = await copyText(url);
+  setNote(ok ? "Link copied — it reopens this exact style in the editor." : "Copy failed — copy the address bar instead.");
+});
+
+document.getElementById("btn-reroll").addEventListener("click", () => {
+  const g = state.finalGenome;
+  if (!g) return;
+  state.history.push(snapshot());
+  let next = randomGenome(state.r, g.archetype);
+  for (let i = 0; i < 12 && genomeKey(next) === genomeKey(g); i++) next = randomGenome(state.r, g.archetype);
+  enterFinale(next);
+  setNote(`New roll of ${ARCHETYPES[g.archetype].name}. Back returns to the previous one.`);
+});
+
+els.promptMode.addEventListener("change", () => {
+  state.promptMode = els.promptMode.value === "compact" ? "compact" : "full";
+  if (state.finalGenome) refreshPrompt();
 });
 
 let noteTimer = null;
 function setNote(msg) {
   els.note.textContent = msg;
   clearTimeout(noteTimer);
-  noteTimer = setTimeout(() => { els.note.textContent = ""; }, 5000);
+  noteTimer = setTimeout(() => { els.note.textContent = ""; }, 6000);
 }
+
+// ------------------------------------------------------------------ import
+
+function extractGenomeJson(text) {
+  const trimmed = text.trim();
+  if (!trimmed) throw new Error("Nothing to import.");
+  // Accept a raw genome, or a prompt .md whose last ```json block is the genome.
+  const fences = [...trimmed.matchAll(/```json\s*([\s\S]*?)```/g)];
+  const candidate = fences.length ? fences[fences.length - 1][1] : trimmed;
+  let parsed;
+  try {
+    parsed = JSON.parse(candidate);
+  } catch {
+    throw new Error("That is not valid JSON. Paste the genome .json contents or a prompt .md that ends with the genome block.");
+  }
+  return normalizeGenome(parsed);
+}
+
+function openImport() {
+  els.importError.hidden = true;
+  els.importText.value = "";
+  els.importFile.value = "";
+  els.importDialog.showModal();
+  els.importText.focus();
+}
+
+document.getElementById("importbtn").addEventListener("click", openImport);
+document.getElementById("import-cancel").addEventListener("click", () => els.importDialog.close());
+els.importFile.addEventListener("change", async () => {
+  const file = els.importFile.files?.[0];
+  if (!file) return;
+  els.importText.value = await file.text();
+});
+document.getElementById("import-load").addEventListener("click", () => {
+  try {
+    const g = extractGenomeJson(els.importText.value);
+    els.importDialog.close();
+    if (!els.finale.hidden || state.liked.length) state.history.push(snapshot());
+    enterFinale(g);
+    setNote(`Imported ${ARCHETYPES[g.archetype].name}.`);
+  } catch (err) {
+    els.importError.textContent = err.message;
+    els.importError.hidden = false;
+  }
+});
 
 // ----------------------------------------------------------- quick filters
 
@@ -425,7 +587,7 @@ document.querySelectorAll(".seg").forEach((seg) => {
 
 // ----------------------------------------------------------------- restart
 
-document.getElementById("restartbtn").addEventListener("click", () => {
+function restart() {
   state.seed = (state.seed * 1103515245 + 12345) % 2147483647;
   state.r = mulberry32(state.seed);
   state.round = 1;
@@ -434,14 +596,19 @@ document.getElementById("restartbtn").addEventListener("click", () => {
   state.shownArchs = new Set();
   state.likedArchs = new Set();
   state.finalGenome = null;
+  state.history = [];
   document.body.classList.remove("themed");
   document.body.removeAttribute("style");
+  history.replaceState(null, "", location.pathname + location.search);
   els.finale.hidden = true;
   els.intro.hidden = false;
   els.grid.hidden = false;
   renderRound();
   window.scrollTo({ top: 0, behavior: "instant" });
-});
+}
+
+document.getElementById("restartbtn").addEventListener("click", restart);
+els.backbtn.addEventListener("click", goBack);
 
 // Website structure is an inspection lens, not a taste gene. Switching it
 // keeps the exact same candidate genomes on screen.
@@ -473,4 +640,25 @@ window.addEventListener("resize", scaleAll);
 // ------------------------------------------------------------------- start
 
 state.r = mulberry32(state.seed);
-renderRound();
+
+// A permalink (#g=…) opens straight into the editor with that exact genome.
+function openFromHash() {
+  let parsed = null;
+  try {
+    parsed = parseHash(location.hash);
+  } catch (err) {
+    setNote(`Could not read the style in this link: ${err.message}`);
+  }
+  if (!parsed) return false;
+  if (SPECIMEN_IDS.includes(parsed.specimen)) {
+    state.specimen = parsed.specimen;
+    els.specimenSelect.value = parsed.specimen;
+  }
+  if (state.finalGenome && genomeKey(state.finalGenome) === genomeKey(parsed.genome)) return true;
+  if (state.finalGenome || state.liked.length) state.history.push(snapshot());
+  enterFinale(parsed.genome);
+  return true;
+}
+
+if (!openFromHash()) renderRound();
+window.addEventListener("hashchange", () => { openFromHash(); });
