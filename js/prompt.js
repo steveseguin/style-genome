@@ -10,7 +10,8 @@
 import { ARCHETYPES } from "./archetypes/index.js";
 import { fontLabel, fontStack } from "./fonts.js";
 import { colorName, describeColor, onColor, contrast } from "./color.js";
-import { shadowValues, chartSpec } from "./render.js";
+import { shadowValues, chartSpec, chartSvg } from "./render.js";
+import { motifsCss, motifNotes } from "./motifs.js";
 import { genomeKey } from "./genome.js";
 import { specimenDefinition } from "./specimens.js";
 import { tokensRootCss, starterCss, glossaryFor, spacingUnit, customPaletteRoles } from "./starter.js";
@@ -262,7 +263,10 @@ export function buildPrompt(g, specimenId = "brand", options = {}) {
   const p = g.p;
   const sh = shadowValues(g);
   const chart = chartSpec(g);
-  const craftCss = a.css(".style-scope", g).trim();
+  const archetypeCss = a.css(".style-scope", g).trim();
+  const motifCss = motifsCss(g, ".style-scope").trim();
+  const craftCss = motifCss ? `${archetypeCss}\n\n/* ---- Component motifs (free slots) ---- */\n${motifCss}` : archetypeCss;
+  const notes = [...a.notes, ...motifNotes(g)];
   const specimen = specimenDefinition(specimenId);
   const id = `${g.archetype}-${genomeKey(g)}`;
   const customColors = customPaletteRoles(g);
@@ -297,9 +301,9 @@ ${glanceTable(g, a)}`);
 
   parts.push(`${H("Rules")}
 
-### Signature details — the archetype is not recognizable without these
+### Signature details — the design is not recognizable without these
 
-${a.notes.map((n) => `- ${n}`).join("\n")}
+${notes.map((n) => `- ${n}`).join("\n")}
 
 ### Always
 
@@ -441,7 +445,14 @@ mark above the fold and repeat its logic in a chart or functional component.
 Do not borrow a neighboring process's shortcut: relief printing needs carved
 negative space/chatter, lithography needs greasy crayon or tusche grain,
 Mokuhanga needs washi/bokashi or registration-edge evidence, and intaglio needs
-line-density or tonal-plate evidence rather than generic vintage decoration.`);
+line-density or tonal-plate evidence rather than generic vintage decoration.
+
+Reference chart markup — the exact SVG the preview renders. The pattern
+\`<defs>\`, fills, and strokes are authoritative; scale the geometry to your data.
+
+\`\`\`svg
+${chartSvg(g, "ref")}
+\`\`\``);
   }
 
   parts.push(`${H("Fidelity checklist before delivery")}

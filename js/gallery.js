@@ -7,8 +7,9 @@ import { sampleElement, SAMPLE_BASE, SAMPLE_W } from "./render.js";
 import { mulberry32 } from "./rng.js";
 import { SPECIMENS } from "./specimens.js";
 import { genomeLink } from "./share.js";
+import { MOTIFS, MOTIF_SLOTS } from "./motifs.js";
 
-const r = mulberry32((Date.now() / 60000) | 0); // varies per minute, stable within it
+let r = mulberry32((Date.now() / 60000) | 0); // varies per minute, stable within it
 
 const baseStyle = document.createElement("style");
 baseStyle.textContent = SAMPLE_BASE;
@@ -20,7 +21,9 @@ document.head.appendChild(galStyle);
 const grid = document.getElementById("gallery");
 const specimenSelect = document.getElementById("specimen-select");
 const familySelect = document.getElementById("family-select");
-const genomes = ARCHETYPE_LIST.map((arch) => ({ arch, g: randomGenome(r, arch.id) }));
+let genomes = ARCHETYPE_LIST.map((arch) => ({ arch, g: randomGenome(r, arch.id) }));
+document.getElementById("combos").textContent =
+  `${ARCHETYPE_LIST.length} archetypes, ${MOTIFS.length} component motifs across ${MOTIF_SLOTS.length} slots, and continuous palette, type, and shape genes`;
 
 for (const specimen of SPECIMENS) {
   const option = document.createElement("option");
@@ -87,12 +90,20 @@ function renderGallery(specimen = "brand", family = "all") {
 const rerender = () => renderGallery(specimenSelect.value, familySelect.value);
 specimenSelect.addEventListener("change", rerender);
 familySelect.addEventListener("change", rerender);
+document.getElementById("rerollbtn").addEventListener("click", () => {
+  r = mulberry32((Math.random() * 2 ** 31) | 0);
+  genomes = ARCHETYPE_LIST.map((arch) => ({ arch, g: randomGenome(r, arch.id) }));
+  rerender();
+});
 
+const USE_ZOOM = typeof CSS !== "undefined" && CSS.supports && CSS.supports("zoom", "0.5");
 function scaleAll() {
   document.querySelectorAll(".tile-viewport").forEach((vp) => {
     const sample = vp.querySelector(".sample");
     if (!sample) return;
-    sample.style.transform = `scale(${vp.clientWidth / SAMPLE_W})`;
+    const scale = vp.clientWidth / SAMPLE_W;
+    if (USE_ZOOM) sample.style.zoom = scale;
+    else sample.style.transform = `scale(${scale})`;
   });
 }
 window.addEventListener("resize", scaleAll);

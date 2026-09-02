@@ -5,6 +5,7 @@
 import { ARCHETYPES } from "./archetypes/index.js";
 import { GENOME_SCHEMA_VERSION } from "./genome.js";
 import { SPECIMEN_IDS } from "./specimens.js";
+import { normalizeMotifs } from "./motifs.js";
 
 const REQUIRED_ROLES = ["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border"];
 
@@ -43,7 +44,7 @@ export function normalizeGenome(raw) {
   }
   const num = (v, d) => (Number.isFinite(Number(v)) ? Number(v) : d);
   const fonts = src.fonts && typeof src.fonts === "object" ? src.fonts : {};
-  return {
+  const g = {
     schemaVersion: GENOME_SCHEMA_VERSION,
     archetype: src.archetype,
     p: { ...src.p, dark: typeof src.p.dark === "boolean" ? src.p.dark : false },
@@ -60,7 +61,11 @@ export function normalizeGenome(raw) {
     chart: src.chart || "bars",
     chartTreatment: src.chartTreatment || "auto",
     chartGrid: src.chartGrid || "auto",
+    motifs: {},
   };
+  const craft = ARCHETYPES[g.archetype].css(".x", g);
+  g.motifs = normalizeMotifs(src.motifs && typeof src.motifs === "object" ? src.motifs : {}, craft, ".x");
+  return g;
 }
 
 export function genomeLink(g, specimen = "brand", base = "") {

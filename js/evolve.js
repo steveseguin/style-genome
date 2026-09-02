@@ -6,12 +6,22 @@
 //   mutation radius shrinking every round. Archetypes the user has seen and
 //   NOT picked are treated as soft rejections and avoided (the explicit
 //   mode/energy filter always outranks rejection-avoidance).
+//
+// Convergence is deliberately gradual: a first pick is treated as evidence,
+// not a template. Round 2 carries the liked palette to only about a third of
+// the cousins and caps identical-palette tiles, so the grid explores form
+// and color separately; by round 4 nearly everything inherits the palette.
 
 import { ARCHETYPES, ARCHETYPE_IDS, relatedArchetypes } from "./archetypes/index.js";
 import { randomGenome, randomGeneGenome, cloneGenome, genomeKey, genomeGenesLabel, GENE_KEYS } from "./genome.js";
 import { hexToHsl } from "./color.js";
 import { fontClass } from "./fonts.js";
+import { chartSpec } from "./render.js";
+import { normalizeMotifs, MOTIF_SLOTS } from "./motifs.js";
 import { pick, chance, shuffle, mulberry32 } from "./rng.js";
+
+const STANDARD_ROLES = new Set(["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border", "dark"]);
+const decorRoles = (p) => Object.fromEntries(Object.entries(p).filter(([key]) => !STANDARD_ROLES.has(key)));
 
 // ---------------------------------------------------------------- distance
 
@@ -39,6 +49,7 @@ function features(g) {
     chart: g.chart,
     chartTreatment: g.chartTreatment || "auto",
     chartGrid: g.chartGrid || "auto",
+    motifs: g.motifs || {},
   };
 }
 
@@ -63,9 +74,10 @@ export function dist(a, b) {
   if (fa.caseStyle !== fb.caseStyle) d += 0.5;
   d += Math.min(Math.abs(fa.weightBucket - fb.weightBucket), 2) * 0.2;
   d += Math.min(Math.abs(fa.trackBucket - fb.trackBucket), 3) * 0.12;
-  if (fa.chart !== fb.chart) d += 0.35;
-  if (fa.chartTreatment !== fb.chartTreatment) d += 0.45;
-  if (fa.chartGrid !== fb.chartGrid) d += 0.2;
+  if (fa.chart !== fb.chart) d += 0.25;
+  if (fa.chartTreatment !== fb.chartTreatment) d += 0.25;
+  if (fa.chartGrid !== fb.chartGrid) d += 0.15;
+  for (const slot of MOTIF_SLOTS) if ((fa.motifs[slot] || "") !== (fb.motifs[slot] || "")) d += 0.15;
   return d;
 }
 
@@ -111,10 +123,33 @@ function modeIds(prefs) {
   return ARCHETYPE_IDS;
 }
 
+// ----------------------------------------------------------- print process
+
+// Physical print treatments (crosshatch, stipple, rough relief…) belong to
+// archetypes that are print processes. They must never be inherited by, say,
+// a concrete-brutalist or SaaS archetype through a cousin or crossover.
+const PROCESS_TREATMENTS = new Set(["hatch", "crosshatch", "stipple", "halftone", "engraved", "rough", "overprint"]);
+const PRINT_TRAITS = ["print", "intaglio", "relief", "planographic", "screen", "offset", "woodblock"];
+const isPrintArchetype = (id) => ARCHETYPES[id].traits.some((t) => PRINT_TRAITS.includes(t));
+export const isPatterned = (g) => PROCESS_TREATMENTS.has(chartSpec(g).treatment);
+
+// Carry chart genes from `from` onto `g` only when the receiving archetype
+// can wear them.
+function carryChartGenes(g, from) {
+  g.chart = from.chart;
+  if (isPrintArchetype(g.archetype) || !PROCESS_TREATMENTS.has(chartSpec(from).treatment)) {
+    g.chartTreatment = from.chartTreatment || "auto";
+    g.chartGrid = from.chartGrid || "auto";
+  } else if (g.chart === "bars-hatch") {
+    g.chart = "bars";
+  }
+}
+
 // A grid must never show two tiles that read identically: same archetype AND
 // same trait caption. (The caption includes the accent color word, so honest
 // re-rolls of an archetype still pass.)
 const labelKey = (g) => `${g.archetype}|${genomeGenesLabel(g)}`;
+const paletteKey = (g) => `${g.p.bg}|${g.p.accent}`;
 
 // ------------------------------------------------- round 1: maximum spread
 
@@ -134,17 +169,21 @@ export function diverseSet(r, n, isTaken, prefs) {
   const chosen = [];
   const archCount = new Map();
   const labels = new Set();
+  let patterned = 0;
+  const MAX_PATTERNED = 3; // the opening grid should not read as a print show
 
   const accept = (c, maxPerArch) => {
     if (isTaken(genomeKey(c))) return false;
     if ((archCount.get(c.archetype) || 0) >= maxPerArch) return false;
     if (labels.has(labelKey(c))) return false;
+    if (patterned >= MAX_PATTERNED && isPatterned(c)) return false;
     return true;
   };
   const take = (c) => {
     chosen.push(c);
     archCount.set(c.archetype, (archCount.get(c.archetype) || 0) + 1);
     labels.add(labelKey(c));
+    if (isPatterned(c)) patterned++;
   };
 
   const families = shuffle(r, [...new Set(pool.map((g) => ARCHETYPES[g.archetype].family))]);
@@ -186,32 +225,42 @@ export function diverseSet(r, n, isTaken, prefs) {
 
 // ------------------------------------------- later rounds: guided neighbors
 
-// Re-run the raw gene sampler for a subset of genes while preserving the
-// selected archetype's bespoke CSS identity.
+// Re-roll a subset of genes while preserving the selected archetype's bespoke
+// CSS identity. Palette and fonts are identity-critical, so they mostly come
+// from the archetype's own conform() (a Bauhaus stays primary-colored) with
+// an occasional raw roll for genuine surprise; the remaining genes vary raw.
 function mutate(r, base, rate) {
   const g = cloneGenome(base);
   const fresh = randomGeneGenome(r, g.archetype);
+  const conformed = randomGenome(r, g.archetype);
   for (const gene of GENE_KEYS) {
     if (!chance(r, rate)) continue;
     if (gene === "p") {
-      const standardRoles = new Set(["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border", "dark"]);
-      const customRoles = Object.fromEntries(Object.entries(g.p).filter(([key]) => !standardRoles.has(key)));
-      g.p = { ...cloneGenome(fresh.p), ...customRoles };
+      g.p = chance(r, 0.7)
+        ? cloneGenome(conformed.p)
+        : { ...cloneGenome(fresh.p), ...decorRoles(g.p) };
+    } else if (gene === "fonts") {
+      g.fonts = cloneGenome(chance(r, 0.7) ? conformed.fonts : fresh.fonts);
+    } else if (gene === "chart") {
+      g.chart = fresh.chart === "bars-hatch" && !isPrintArchetype(g.archetype) ? "bars" : fresh.chart;
+    } else if (gene === "chartTreatment" || gene === "chartGrid") {
+      g[gene] = conformed[gene];
+    } else if (gene === "motifs") {
+      g.motifs = cloneGenome(conformed.motifs || {});
     } else {
       g[gene] = cloneGenome(fresh)[gene];
     }
   }
-  // The base archetype's bespoke CSS remains the identity. Re-conforming here
-  // would erase the variation and collapse fixed presets back into duplicates.
   return g;
 }
 
-// Jump to a related archetype but carry the liked genes the new archetype's
-// conform() allows to survive. A cousin exists to EXPLORE: it never lands on
-// a liked archetype (mutate() covers those), prefers archetypes the user
-// hasn't rejected, but will fall back to rejected relatives rather than
-// produce nothing (a re-rolled rejected relative beats an empty slot).
-function cousin(r, base, rejectedArchs, prefs, likedArchs) {
+// Jump to a related archetype. With probability carryP it wears the liked
+// palette (a "bridge"); otherwise it keeps its own palette so the grid
+// explores form independently of color. A cousin exists to EXPLORE: it never
+// lands on a liked archetype (mutate() covers those), prefers archetypes the
+// user hasn't rejected, but will fall back to rejected relatives rather than
+// produce nothing.
+function cousin(r, base, rejectedArchs, prefs, likedArchs, carryP) {
   const inMode = new Set(modeIds(prefs));
   let rel = relatedArchetypes(base.archetype).filter((id) => inMode.has(id));
   if (!rel.length) rel = relatedArchetypes(base.archetype);
@@ -220,15 +269,13 @@ function cousin(r, base, rejectedArchs, prefs, likedArchs) {
   const pool = fresh.length ? fresh : exploring.length ? exploring : rel;
   const g = randomGenome(r, pick(r, pool));
   const carried = cloneGenome(base);
-  // Carry the complete standard palette promised by the picker while
-  // preserving target-archetype custom decor roles such as gold/paper3.
-  const standardRoles = new Set(["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border", "dark"]);
-  const targetDecor = Object.fromEntries(Object.entries(g.p).filter(([key]) => !standardRoles.has(key)));
-  g.p = { ...cloneGenome(carried.p), ...targetDecor };
+  if (chance(r, carryP)) {
+    // Carry the complete standard palette promised by the picker while
+    // preserving target-archetype custom decor roles such as gold/paper3.
+    g.p = { ...cloneGenome(carried.p), ...decorRoles(g.p) };
+  }
   g.density = carried.density;
-  g.chart = carried.chart;
-  g.chartTreatment = carried.chartTreatment || "auto";
-  g.chartGrid = carried.chartGrid || "auto";
+  carryChartGenes(g, carried);
   return g;
 }
 
@@ -238,9 +285,12 @@ function crossover(r, a, b) {
   for (const gene of GENE_KEYS) {
     if (!chance(r, 0.5)) continue;
     if (gene === "p") {
-      const standardRoles = new Set(["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border", "dark"]);
-      const baseDecor = Object.fromEntries(Object.entries(g.p).filter(([key]) => !standardRoles.has(key)));
-      g.p = { ...cloneGenome(other.p), ...baseDecor };
+      g.p = { ...cloneGenome(other.p), ...decorRoles(g.p) };
+    } else if (gene === "chart" || gene === "chartTreatment" || gene === "chartGrid") {
+      carryChartGenes(g, other);
+    } else if (gene === "motifs") {
+      const craft = ARCHETYPES[g.archetype].css(".x", g);
+      g.motifs = normalizeMotifs(other.motifs, craft, ".x");
     } else {
       g[gene] = cloneGenome(other)[gene];
     }
@@ -250,13 +300,13 @@ function crossover(r, a, b) {
   return g;
 }
 
-// round: 2, 3, 4… — later rounds mutate less and wander less.
+// round: 2, 3, 4… — later rounds mutate less, wander less, and inherit more.
 export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = new Set()) {
   const cfg = {
-    2: { rate: 0.55, cousinP: 0.4, wildP: 0.15 },
-    3: { rate: 0.4, cousinP: 0.3, wildP: 0.06 },
-    4: { rate: 0.25, cousinP: 0.2, wildP: 0 },
-  }[Math.min(round, 4)] || { rate: 0.2, cousinP: 0.15, wildP: 0 };
+    2: { rate: 0.55, cousinP: 0.4, wildP: 0.15, carryP: 0.35, samePal: 2 },
+    3: { rate: 0.4, cousinP: 0.3, wildP: 0.06, carryP: 0.6, samePal: 4 },
+    4: { rate: 0.25, cousinP: 0.2, wildP: 0, carryP: 0.85, samePal: 7 },
+  }[Math.min(round, 4)] || { rate: 0.2, cousinP: 0.15, wildP: 0, carryP: 0.9, samePal: 8 };
   const crossP = liked.length >= 2 ? 0.25 : 0;
 
   const fav = liked[liked.length - 1];
@@ -266,6 +316,12 @@ export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = 
   // never build a near-clone of it or a same-reading caption.
   const labels = new Set([labelKey(fav)]);
   const archCount = new Map([[fav.archetype, 1]]);
+  const favPal = paletteKey(fav);
+  let samePal = 0;
+  let patterned = 0;
+  // If the user has not shown interest in a print process, keep patterned
+  // charts rare; if they picked one, let the print family come through.
+  const maxPatterned = liked.some(isPatterned) ? n : 2;
   const inModeIds = modeIds(prefs);
   const wildIdsFresh = inModeIds.filter((id) => !rejectedArchs.has(id));
   const wildIds = wildIdsFresh.length ? wildIdsFresh : inModeIds;
@@ -281,6 +337,8 @@ export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = 
     if (labels.has(labelKey(g))) return false;
     if (strict) {
       if ((archCount.get(g.archetype) || 0) >= 2) return false;
+      if (paletteKey(g) === favPal && samePal >= cfg.samePal) return false;
+      if (isPatterned(g) && patterned >= maxPatterned) return false;
       for (const o of out) if (dist(g, o) < 1.2) return false;
     }
     return true;
@@ -289,6 +347,8 @@ export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = 
     batchKeys.add(genomeKey(g));
     labels.add(labelKey(g));
     archCount.set(g.archetype, (archCount.get(g.archetype) || 0) + 1);
+    if (paletteKey(g) === favPal) samePal++;
+    if (isPatterned(g)) patterned++;
     out.push(g);
   };
   const likedArchs = new Set(liked.map((g) => g.archetype));
@@ -301,7 +361,7 @@ export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = 
       return crossover(r, liked[i], liked[j]);
     }
     if (roll < crossP + cfg.wildP) return randomGenome(r, pick(r, wildIds));
-    if (roll < crossP + cfg.wildP + cfg.cousinP) return cousin(r, pick(r, liked), rejectedArchs, prefs, likedArchs);
+    if (roll < crossP + cfg.wildP + cfg.cousinP) return cousin(r, pick(r, liked), rejectedArchs, prefs, likedArchs, cfg.carryP);
     return mutate(r, pick(r, liked), cfg.rate);
   };
 

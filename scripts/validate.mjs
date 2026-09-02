@@ -12,6 +12,7 @@ import { diverseSet, neighborSet } from "../js/evolve.js";
 import { fullStylesheet, tokensRootCss, starterCss } from "../js/starter.js";
 import { encodeGenome, decodeGenome, genomeLink, parseHash, normalizeGenome } from "../js/share.js";
 import { describeColor } from "../js/color.js";
+import { MOTIFS, MOTIF_SLOTS, MOTIF_BY_ID, MOTIF_COMBOS, motifAllowed, motifsCss } from "../js/motifs.js";
 
 const REQUIRED_ARCHETYPE_FIELDS = ["id", "name", "family", "traits", "blurb", "notes", "conform", "css"];
 const PALETTE_ROLES = ["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border", "dark"];
@@ -58,6 +59,14 @@ for (const archetype of ARCHETYPE_LIST) {
     // The craft CSS must never leak an undefined interpolation.
     const craft = archetype.css(".style-scope", genome);
     assert.ok(!/undefined|NaN/.test(craft), `${archetype.id}: craft CSS contains undefined/NaN`);
+
+    // Motifs occupy slots the archetype's own CSS leaves open, or stack as
+    // additive decorations where nothing conflicts.
+    for (const [slot, id] of Object.entries(genome.motifs || {})) {
+      assert.ok(MOTIF_BY_ID[id] && MOTIF_BY_ID[id].slot === slot, `${archetype.id}: bad motif ${slot}=${id}`);
+      assert.ok(motifAllowed(MOTIF_BY_ID[id], craft, ".style-scope"), `${archetype.id}: motif ${id} conflicts with the archetype's own ${slot} styling`);
+    }
+    assert.ok(!/undefined|NaN/.test(motifsCss(genome, ".style-scope")), `${archetype.id}: motif CSS contains undefined/NaN`);
 
     const prompt = buildPrompt(genome);
     prompts++;
@@ -116,6 +125,25 @@ assert.deepEqual(
   "chart treatment coverage changed without updating validation",
 );
 
+// Every motif renders for a light and a dark genome, declares a real slot,
+// and never uses the banned accent edge-stripe pattern.
+const lightG = randomGenome(mulberry32(1), "flatneutral");
+const darkG = randomGenome(mulberry32(2), "cosmic");
+const motifIds = new Set();
+for (const m of MOTIFS) {
+  assert.ok(MOTIF_SLOTS.includes(m.slot), `motif ${m.id}: unknown slot ${m.slot}`);
+  assert.ok(!motifIds.has(m.id), `duplicate motif id ${m.id}`);
+  motifIds.add(m.id);
+  assert.ok(m.note && m.note.length > 30, `motif ${m.id}: needs a prompt note`);
+  for (const g of [lightG, darkG]) {
+    const css = m.css(".style-scope", g);
+    assert.ok(css.includes(".style-scope"), `motif ${m.id}: unscoped CSS`);
+    assert.ok(!/undefined|NaN/.test(css), `motif ${m.id}: CSS contains undefined/NaN`);
+    assert.ok(!/border-(left|right)\s*:\s*[^;]*var\(--accent/.test(css), `motif ${m.id}: accent edge stripe`);
+  }
+}
+assert.ok(MOTIF_COMBOS > 1_000_000, `motif combination space too small: ${MOTIF_COMBOS}`);
+
 // Import must reject junk with a readable message and accept a bare genome.
 assert.throws(() => normalizeGenome({ archetype: "nope", p: {} }), /Unknown archetype/);
 assert.throws(() => normalizeGenome({ archetype: "swiss", p: { bg: "#fff" } }), /Palette is missing/);
@@ -155,4 +183,4 @@ for (let seed = 0; seed < 32; seed++) {
 assert.ok(siblingKeys.size >= 12, `fixed-style variation regressed: only ${siblingKeys.size} unique Broadsheet siblings`);
 assert.ok(!siblingKeys.has(genomeKey(fixedBase)), "fixed-style mutation repeated the canonical Broadsheet genome");
 
-console.log(`Validated ${ids.size} archetypes, ${keys.size} genomes, ${prompts} prompts, ${renders} specimen renders, stylesheet + permalink round-trips, complete discovery exposure, and live sibling variation.`);
+console.log(`Validated ${ids.size} archetypes, ${MOTIFS.length} motifs (${MOTIF_COMBOS.toLocaleString()} combinations), ${keys.size} genomes, ${prompts} prompts, ${renders} specimen renders, stylesheet + permalink round-trips, complete discovery exposure, and live sibling variation.`);

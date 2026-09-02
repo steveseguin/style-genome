@@ -56,7 +56,7 @@ genome ──┬─► scoped CSS (what you see, live)
          └─► PNG + JSON exports
 ```
 
-A genome = **archetype × parameters**:
+A genome = **archetype × parameters × component motifs**:
 
 - **Archetypes** (`js/archetypes/*.js`, 114 of them across 12 families and 21 registry modules) are
   hand-crafted design languages — Swiss Modern, Phosphor Terminal,
@@ -72,6 +72,16 @@ A genome = **archetype × parameters**:
   width, shadow model, substrate texture, density, letter case, chart geometry,
   mark treatment, and grid treatment. Print charts include true crosshatch,
   stipple, halftone, engraved linework, rough relief, and overprint processes.
+- **Component motifs** (`js/motifs.js`, 96 of them across 9 slots: backdrop,
+  hero decoration, headline, eyebrow label, panels, buttons, tags, logo mark,
+  header/footer) are independent sub-component treatments sampled per design.
+  An archetype's own craft CSS keeps authority over every slot it styles;
+  motifs fill the slots it leaves open, and a few additive ones (prefix
+  glyphs, index labels, accent initials, nav underlines) can stack where
+  nothing conflicts. Quiet archetypes (minimal, calm, elegant) draw fewer.
+  The result is a combinatorial design space rather than a set of presets:
+  the same archetype rolls differently in palette, type, shape, texture,
+  chart, and motifs every time.
 - **Structures** (`js/specimens.js`) are deliberately separate from taste genes.
   Brand, publication, knowledge, operations, storefront, workflow, community,
   reservation, and component-state previews apply one unchanged genome to
@@ -86,8 +96,15 @@ A genome = **archetype × parameters**:
   quick filters (Light/Dark, Calm/Bold) constrain the whole session for people
   who already know that much.
 - **Rounds 2–4** sample neighbors of the liked set: same archetype re-rolled,
-  "cousins" (related archetype carrying your palette), crossovers of two liked
-  styles, and early-round wildcards. Mutation radius shrinks each round.
+  "cousins" (related archetypes), crossovers of two liked styles, and
+  early-round wildcards. Mutation radius shrinks each round. Convergence is
+  gradual: a first pick is evidence, not a template — in round 2 only about a
+  third of cousins carry the liked palette and identical-palette tiles are
+  capped, so the grid explores form and color separately; by round 4 nearly
+  everything inherits the palette. Palette and font mutations mostly come from
+  the archetype's own conform() so identities hold. Physical print chart
+  treatments (crosshatch, stipple, rough relief…) never leak onto non-print
+  archetypes, and patterned charts are capped per grid unless you picked one.
   Everything shown is tracked so no style repeats; archetypes you were shown
   but didn't pick are treated as soft rejections and avoided; and every grid
   enforces a minimum style-distance from your current favorite so you never

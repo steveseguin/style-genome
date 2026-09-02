@@ -7,6 +7,7 @@ import { basePalette, STRATEGIES } from "./palettes.js";
 import { FONT_KEYS } from "./fonts.js";
 import { pick, wpick, irange, chance, hashStr } from "./rng.js";
 import { colorName } from "./color.js";
+import { sampleMotifs } from "./motifs.js";
 
 export const GENOME_SCHEMA_VERSION = 2;
 export const SHADOWS = ["none", "soft", "lifted", "hard", "emboss", "glow"];
@@ -32,7 +33,7 @@ export const RADII = [0, 2, 4, 6, 8, 10, 12, 16, 20, 24, 28];
 // newly added genes.
 export const GENE_KEYS = [
   "p", "fonts", "radius", "ctl", "bw", "shadow", "texture", "density",
-  "case", "hw", "track", "chart", "chartTreatment", "chartGrid",
+  "case", "hw", "track", "chart", "chartTreatment", "chartGrid", "motifs",
 ];
 
 // Raw random genes before an archetype imposes its canonical identity. These
@@ -65,13 +66,18 @@ export function randomGeneGenome(r, archetypeId) {
     chart: pick(r, CHARTS),
     chartTreatment: "auto",
     chartGrid: "auto",
+    motifs: {},
   };
 }
 
+// A design = archetype identity (conform) + one optional motif per component
+// slot the archetype leaves open. The motif draw happens after conform so it
+// can respect the final palette mode and the archetype's own craft CSS.
 export function randomGenome(r, archetypeId) {
   const g = randomGeneGenome(r, archetypeId);
-  const archetype = g.archetype;
-  ARCHETYPES[archetype].conform(g, r);
+  const archetype = ARCHETYPES[g.archetype];
+  archetype.conform(g, r);
+  g.motifs = sampleMotifs(r, g, archetype.css(".x", g), archetype.traits, ".x");
   return g;
 }
 

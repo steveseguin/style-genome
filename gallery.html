@@ -40,7 +40,7 @@
 <body>
   <header class="apphead">
     <div class="apphead-inner">
-      <div class="ah-brand"><span class="ah-mark"></span><span class="ah-name">Style Genome — gallery</span></div>
+      <a class="ah-brand" href="index.html" title="Back to the picker"><span class="ah-mark"></span><span class="ah-name">Style Genome — gallery</span></a>
       <div class="ah-round" id="count"></div>
       <label class="ah-structure" for="specimen-select">
         <span>Preview as</span>
@@ -50,13 +50,16 @@
         <span>Family</span>
         <select id="family-select" aria-label="Filter archetype family"></select>
       </label>
-      <a class="ah-restart" style="text-decoration:none" href="index.html">← Back to the picker</a>
+      <div class="ah-actions">
+        <button class="ah-restart" id="rerollbtn" type="button" title="Draw a fresh roll of every archetype">Re-roll all</button>
+        <a class="ah-restart" style="text-decoration:none" href="index.html">← Back to the picker</a>
+      </div>
     </div>
   </header>
   <main class="stage">
     <section class="intro">
-      <h1>Every archetype, one roll each.</h1>
-      <p class="gal-note">A stable render of every hand-crafted archetype, with one shared structure at a time so visual differences stay comparable. Switch structures above; reload after a minute for another parameter roll. “Open in editor” takes any roll straight to the tuner and its exports.</p>
+      <h1>Every archetype, freshly rolled.</h1>
+      <p class="gal-note">An archetype is a design language, not a preset: every tile is one random draw of its palette, type, shape, depth, texture, chart, and component motifs. <span id="combos"></span>. Re-roll to see other draws, switch the shared structure above, or open any roll in the editor.</p>
     </section>
     <section class="tiles" id="gallery"></section>
   </main>

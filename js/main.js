@@ -13,6 +13,7 @@ import { SPECIMENS, SPECIMEN_IDS } from "./specimens.js";
 import { ARCHETYPES } from "./archetypes/index.js";
 import { fullStylesheet } from "./starter.js";
 import { genomeLink, parseHash, normalizeGenome } from "./share.js";
+import { MOTIF_SLOTS, SLOT_LABELS, freeSlots, allowedMotifs } from "./motifs.js";
 
 const ROUNDS = 4;
 const GRID_N = 12;
@@ -380,12 +381,35 @@ function buildEditor() {
     state.finalGenome.chartGrid = v; refreshFinale();
   }, (v) => v === "auto" ? "style default" : v));
 
+  // --- component motifs (only the slots this archetype leaves open)
+  const motifGroup = group("Component motifs");
+  const craft = ARCHETYPES[g.archetype].css(".x", g);
+  const free = freeSlots(craft, ".x");
+  g.motifs = g.motifs || {};
+  for (const slot of MOTIF_SLOTS) {
+    const allowed = allowedMotifs(slot, craft, ".x");
+    if (!allowed.length) continue;
+    const options = ["none", ...allowed.map((m) => m.id)];
+    const labels = Object.fromEntries(allowed.map((m) => [m.id, m.name]));
+    motifGroup.appendChild(selectRow(SLOT_LABELS[slot], options, g.motifs[slot] || "none", (v) => {
+      if (v === "none") delete state.finalGenome.motifs[slot];
+      else state.finalGenome.motifs[slot] = v;
+      refreshFinale();
+    }, (v) => labels[v] || "none"));
+  }
+  const claimedNote = document.createElement("p");
+  claimedNote.className = "ed-note";
+  claimedNote.textContent = free.length === MOTIF_SLOTS.length
+    ? "Each slot is an independent sub-component; this archetype leaves all of them open."
+    : `Slots this archetype styles itself (${MOTIF_SLOTS.filter((s) => !free.includes(s)).map((s) => SLOT_LABELS[s].toLowerCase()).join(", ")}) keep its design; only additive decorations can stack on them.`;
+  motifGroup.appendChild(claimedNote);
+
   const note = document.createElement("p");
   note.className = "ed-note";
   note.textContent =
     "Every change updates the preview, this whole page, the prompt, the stylesheet, and the link in your address bar — they all derive from the same style genome.";
 
-  els.editor.append(palGroup, typeGroup, shapeGroup, vizGroup, note);
+  els.editor.append(palGroup, typeGroup, shapeGroup, vizGroup, motifGroup, note);
 
   function group(title) {
     const div = document.createElement("div");
@@ -608,6 +632,7 @@ function restart() {
 }
 
 document.getElementById("restartbtn").addEventListener("click", restart);
+document.getElementById("brandlink").addEventListener("click", (ev) => { ev.preventDefault(); restart(); });
 els.backbtn.addEventListener("click", goBack);
 
 // Website structure is an inspection lens, not a taste gene. Switching it
@@ -627,12 +652,18 @@ els.specimenSelect.addEventListener("change", () => {
 
 // ----------------------------------------------------------------- scaling
 
+// CSS zoom keeps 1px rules at least one device pixel wide at tile scale;
+// transform: scale() would blur hairlines into broken fragments on 1x displays.
+const USE_ZOOM = typeof CSS !== "undefined" && CSS.supports && CSS.supports("zoom", "0.5");
+export function fitSample(vp, sample) {
+  const scale = vp.clientWidth / SAMPLE_W;
+  if (USE_ZOOM) sample.style.zoom = scale;
+  else sample.style.transform = `scale(${scale})`;
+}
 function scaleAll() {
   document.querySelectorAll(".tile-viewport, .fin-preview-wrap").forEach((vp) => {
     const sample = vp.querySelector(".sample");
-    if (!sample) return;
-    const scale = vp.clientWidth / SAMPLE_W;
-    sample.style.transform = `scale(${scale})`;
+    if (sample) fitSample(vp, sample);
   });
 }
 window.addEventListener("resize", scaleAll);

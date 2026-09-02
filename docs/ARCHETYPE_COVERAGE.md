@@ -41,6 +41,18 @@ Constructivism, Art Nouveau, Art Deco, Arts & Crafts, Victorian engraving,
 Gothic Blackletter, Italian Futurism, Dada, Suprematism, Cubism, Surrealism,
 Pop Art, Op Art, Psychedelia, Mid-Century Atomic, and New Wave/Cranbrook.
 
+## Component motifs
+
+`js/motifs.js` defines 96 motifs across nine component slots (backdrop, hero
+decoration, headline, eyebrow label, panels, buttons, tags, logo mark, and
+header/footer). A motif declares a `fit` (light/dark requirement, trait
+affinities, traits to avoid), a prompt note, and scoped CSS. Slots an
+archetype's craft CSS already styles are detected from its selectors; only
+motifs marked `additive` may stack there, and only when none of their declared
+conflict patterns appear. `npm test` renders every motif for a light and a
+dark genome and rejects any that leaks an undefined value or uses an
+accent-colored edge stripe.
+
 ## Structure and component coverage
 
 Every unchanged genome is inspected as:

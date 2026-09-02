@@ -8,6 +8,7 @@ import { alpha, mix, onColor } from "./color.js";
 import { genomeKey } from "./genome.js";
 import { NOISE_URI, SAMPLE_BASE, SAMPLE_W, SAMPLE_H } from "./sampleBase.js";
 import { specimenMarkup } from "./specimens.js";
+import { motifsCss } from "./motifs.js";
 
 export { SAMPLE_BASE, SAMPLE_W, SAMPLE_H };
 
@@ -63,7 +64,7 @@ function chartPatterns(treatment, uid) {
   }
 }
 
-function chartSvg(g, uid) {
+export function chartSvg(g, uid) {
   const w = 210, h = 96, pad = 6;
   const spec = chartSpec(g);
   const base = `<line x1="${pad}" y1="${h - pad}" x2="${w - pad}" y2="${h - pad}" stroke="var(--border)" stroke-width="1"/>`;
@@ -266,7 +267,7 @@ export function buildSample(g, specimen = "brand") {
   const uid = genomeKey(g);
   const cls = `s-${uid}`;
   const s = `.${cls}`;
-  const css = tokensCss(g, s) + ARCHETYPES[g.archetype].css(s, g);
+  const css = tokensCss(g, s) + ARCHETYPES[g.archetype].css(s, g) + "\n" + motifsCss(g, s);
   const html = sampleMarkup(g, uid, specimen);
   return { cls, html, css, uid, specimen };
 }

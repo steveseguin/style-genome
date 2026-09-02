@@ -7,6 +7,7 @@
 import { fontStack } from "./fonts.js";
 import { onColor } from "./color.js";
 import { shadowValues, textureCss } from "./render.js";
+import { motifsCss } from "./motifs.js";
 
 const SPACING = { airy: 12, normal: 9, dense: 7 };
 const STANDARD_ROLES = new Set(["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border", "dark"]);
@@ -222,7 +223,8 @@ export function glossaryFor(craftCss) {
 
 // Complete standalone stylesheet: tokens + starter + craft.
 export function fullStylesheet(g, archetype, id) {
-  const craft = archetype.css(".style-scope", g).trim();
+  const motif = motifsCss(g, ".style-scope").trim();
+  const craft = archetype.css(".style-scope", g).trim() + (motif ? `\n\n/* ---- Component motifs (free slots) ---- */\n${motif}` : "");
   return `/* Style Genome — "${archetype.name}" (${id})
    Generated stylesheet: design tokens + starter components + archetype craft CSS.
    Usage: add class="style-scope" to <body>, link this file, and use the class
