@@ -138,7 +138,7 @@ ${s} .chip:last-child {
   background: linear-gradient(180deg, ${mix(acc2, "#ffffff", 0.2)}, ${acc2});
   color: #ffffff; border: none; text-transform: uppercase; font-weight: 800; letter-spacing: .05em;
 }
-${s} .stat-num { color: ${acc}; }
+${s} .stat-num { color: var(--accent-text); }
 ${s} .logo {
   position: relative;
   border-radius: 5px;
@@ -210,8 +210,8 @@ ${s} .btn-b {
   background: linear-gradient(180deg, #ffffff, #e8edf2); color: var(--ink); border: 1px solid #c2cad4;
 }
 ${s} .chip { background: #ffffff; border-color: #d0d8e1; }
-${s} .kicker { color: ${acc}; }
-${s} .stat-num { color: ${acc}; }
+${s} .kicker { color: var(--accent-text); }
+${s} .stat-num { color: var(--accent-text); }
 ${s} .logo {
   width: 34px; height: 12px; border-radius: 0;
   background:
@@ -257,7 +257,7 @@ ${s} .logo {
     css(s, g) {
       return `
 ${s} .display { font-size: 38px; }
-${s} .kicker { color: var(--accent); }
+${s} .kicker { color: var(--accent-text); }
 ${s} .kicker::before { content: "▶ "; }
 ${s} .topbar { border-bottom: 3px solid var(--ink); }
 ${s} .foot { border-top: 3px solid var(--ink); font-family: var(--f-mono); }
@@ -265,13 +265,13 @@ ${s} .card {
   background: #0d0d0d; border: 3px solid var(--ink); border-radius: 0;
   box-shadow: 4px 4px 0 var(--bg), 6px 6px 0 var(--ink);
 }
-${s} .card-t { color: var(--accent2); }
+${s} .card-t { color: var(--accent2-text); }
 ${s} .chip {
   border: 2px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink);
   font-family: var(--f-mono); text-transform: uppercase; font-weight: 700; letter-spacing: .08em;
 }
-${s} .stat-num { color: var(--accent); letter-spacing: .14em; }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-num { color: var(--accent-text); letter-spacing: .14em; }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .btn {
   border: 3px solid var(--ink); border-radius: 0; font-family: var(--f-mono);
   text-transform: uppercase; font-weight: 700; box-shadow: 0 4px 0 var(--ink);

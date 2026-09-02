@@ -39,7 +39,7 @@ ${s} .display { font-size: 52px; line-height: 1.04; }
 ${s} .kicker { letter-spacing: .2em; font-size: 11px; }
 ${s} .sub::first-letter {
   font-family: var(--f-display); float: left; font-size: 46px; line-height: .82;
-  padding: 4px 8px 0 0; color: var(--accent); font-weight: 600;
+  padding: 4px 8px 0 0; color: var(--accent-text); font-weight: 600;
 }
 ${s} .cards { gap: 0; }
 ${s} .card { background: transparent; border: none; border-left: 1px solid var(--border); border-radius: 0; padding: 4px 22px 0; }
@@ -139,7 +139,7 @@ ${s} .card::after {
   border: 1.5px solid ${alpha(g.p.accent, 0.4)}; mix-blend-mode: multiply;
 }
 ${s} .chip { border-width: 2px; color: var(--ink); font-weight: 700; }
-${s} .stat-num { color: var(--accent); text-shadow: 1.5px 1.5px 0 ${alpha(g.p.ink, 0.5)}; }
+${s} .stat-num { color: var(--accent-text); text-shadow: 1.5px 1.5px 0 ${alpha(g.p.ink, 0.5)}; }
 ${s} .btn-b { border-width: 2px; }
 ${s} .logo { background: var(--accent); box-shadow: 2px 2px 0 ${alpha(g.p.ink, 0.6)}; }
 ${s} .kicker { color: var(--ink); }
@@ -190,10 +190,10 @@ ${s} .card:nth-child(2) { transform: rotate(0.7deg); }
 ${s} .card:nth-child(3) { transform: rotate(-0.4deg); }
 ${s} .chip { background: var(--ink); color: var(--bg); border-radius: 0; transform: rotate(-1deg); font-weight: 700; }
 ${s} .chip:nth-child(2) { transform: rotate(1.4deg); }
-${s} .kicker { color: var(--accent); font-family: var(--f-mono); letter-spacing: .05em; }
+${s} .kicker { color: var(--accent-text); font-family: var(--f-mono); letter-spacing: .05em; }
 ${s} .btn { border-radius: 0; box-shadow: 3px 3px 0 var(--ink); }
 ${s} .btn-b { border-color: var(--ink); border-width: 2px; }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .logo { border-radius: 0; background: var(--ink); }
 `;
     },
@@ -230,7 +230,7 @@ ${s} .logo { border-radius: 0; background: var(--ink); }
 ${s} .card { border: 3px double var(--border); }
 ${s} .smain { position: relative; border: 3px double var(--border); padding-inline: 18px; }
 ${s} .smain::before {
-  content: "\\2766"; position: absolute; right: 7px; top: 58px; color: var(--accent2);
+  content: "\\2766"; position: absolute; right: 7px; top: 58px; color: var(--accent2-text);
   font-size: 26px; line-height: 1; text-shadow: 0 38px 0 var(--accent), 0 76px 0 var(--accent2);
 }
 ${s} .hero { padding-right: 150px; position: relative; }
@@ -245,14 +245,14 @@ ${s} .hero::after {
 ${s} .topbar { border-bottom: 3px double var(--border); }
 ${s} .foot { border-top: 3px double var(--border); }
 ${s} .display { font-size: 46px; }
-${s} .kicker { color: var(--accent); letter-spacing: .18em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .18em; }
 ${s} .sub::first-letter {
   font-family: var(--f-display); float: left; font-size: 44px; line-height: .8;
-  padding: 5px 8px 2px; margin-right: 5px; color: var(--accent); font-weight: 700;
+  padding: 5px 8px 2px; margin-right: 5px; color: var(--accent-text); font-weight: 700;
   border: 1px solid var(--accent2); background: var(--surface);
 }
-${s} .chip { border-color: var(--border); color: var(--accent); }
-${s} .stat-num { color: var(--accent); }
+${s} .chip { border-color: var(--border); color: var(--accent-text); }
+${s} .stat-num { color: var(--accent-text); }
 ${s} .btn-a { background: var(--accent); }
 ${s} .logo { background: var(--accent2); border-radius: 0; transform: rotate(45deg); width: 11px; height: 11px; }
 `;
@@ -293,13 +293,13 @@ ${s} .card { border: 1px dashed var(--border); background: transparent; }
 ${s} .topbar { border-bottom: 1px solid var(--border); }
 ${s} .foot { border-top: 1px solid var(--border); font-family: var(--f-mono); }
 ${s} .display { font-size: 42px; letter-spacing: .04em; }
-${s} .kicker { color: var(--accent2); font-family: var(--f-mono); }
+${s} .kicker { color: var(--accent2-text); font-family: var(--f-mono); }
 ${s} .kicker::before { content: "DWG № "; }
 ${s} .btn-a { background: var(--ink); color: ${g.p.bg}; box-shadow: none; }
 ${s} .btn-b { border: 1px dashed var(--border); }
 ${s} .chip { border: 1px dashed var(--border); border-radius: 0; font-family: var(--f-mono); text-transform: uppercase; font-size: 10px; }
 ${s} .logo { background: transparent; border: 1.5px solid var(--ink); border-radius: 0; }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .card-t::after { content: " —"; color: var(--muted); }
 `;
     },

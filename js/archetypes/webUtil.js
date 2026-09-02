@@ -43,7 +43,7 @@ ${s} .kicker { text-transform: lowercase; letter-spacing: 0; color: var(--muted)
 ${s} .kicker::before { content: "docs / "; color: var(--muted); }
 ${s} .display { font-size: 40px; letter-spacing: -0.02em; }
 ${s} .card:first-child { background: ${mix(g.p.accent, "#ffffff", 0.9)}; border-color: var(--border); }
-${s} .card:first-child .card-t::before { content: "ⓘ  "; color: var(--accent); font-weight: 700; }
+${s} .card:first-child .card-t::before { content: "ⓘ  "; color: var(--accent-text); font-weight: 700; }
 ${s} .chip {
   font-family: var(--f-mono); background: var(--surface2); border: none;
   border-radius: 4px; color: var(--ink); font-size: 12px; padding: 2px 7px;
@@ -53,7 +53,7 @@ ${s} .topnav .nl.on {
   text-decoration-thickness: 2px; text-decoration-color: var(--accent);
 }
 ${s} .btn-a { box-shadow: none; }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .logo { border-radius: 3px; }
 `;
     },
@@ -112,9 +112,9 @@ ${s} .btn {
   background: #e6e6e6; color: var(--ink); border: 2px solid var(--ink);
   border-radius: 0; box-shadow: none; font-weight: 700;
 }
-${s} .btn-a { background: #d6d6d6; }
+${s} .btn-a { background: #d6d6d6; color: #0d0d0d; }
 ${s} .stat-delta {
-  color: var(--accent); text-transform: uppercase; font-weight: 700; letter-spacing: 0.14em;
+  color: var(--accent-text); text-transform: uppercase; font-weight: 700; letter-spacing: 0.14em;
   font-size: 12px; display: inline-block; transform: rotate(-4deg); transform-origin: left center;
 }
 ${s} .chart { --accent: var(--ink); }

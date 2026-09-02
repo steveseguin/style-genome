@@ -46,9 +46,9 @@ ${s} .logo {
 ${s} .card-t { font-weight: 500; }
 ${s} .card-t::before { content: "[ "; color: var(--muted); font-family: var(--f-mono); }
 ${s} .card-t::after { content: " ]"; color: var(--muted); font-family: var(--f-mono); }
-${s} .kicker { color: var(--accent); font-family: var(--f-mono); letter-spacing: .04em; }
+${s} .kicker { color: var(--accent-text); font-family: var(--f-mono); letter-spacing: .04em; }
 ${s} .kicker::before { content: "\\2194  "; }
-${s} .stat-delta { color: var(--accent); font-family: var(--f-mono); font-weight: 500; }
+${s} .stat-delta { color: var(--accent-text); font-family: var(--f-mono); font-weight: 500; }
 ${s} .stat-num { color: var(--ink); }
 ${s} .spark {
   height: 46px; border: 1px solid var(--border);
@@ -114,9 +114,9 @@ ${s}::after {
 ${s} .topbar, ${s} .smain, ${s} .foot { z-index: 2; }
 ${s} .logo { background: var(--accent); border-radius: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 ${s} .display { font-size: 46px; }
-${s} .kicker { color: var(--accent); }
+${s} .kicker { color: var(--accent-text); }
 ${s} .card { background: #ffffff; }
-${s} .stat-num { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
 ${s} .btn-a { box-shadow: 0 6px 14px ${alpha(g.p.accent, 0.28)}; }
 ${s} .chip { border-color: var(--border); color: var(--muted); }
 `;
@@ -168,7 +168,7 @@ ${s} {
 }
 ${s} .card { background: ${alpha("#ffffff", 0.04)}; border: 1px solid ${alpha("#ffffff", 0.12)}; }
 ${s} .kicker, ${s} .stat-label { letter-spacing: .2em; }
-${s} .kicker { color: var(--accent2); }
+${s} .kicker { color: var(--accent2-text); }
 ${s} .display { font-size: 46px; }
 ${s} .btn-a { background: #ffffff; color: #0a0b16; border-color: #ffffff; box-shadow: none; }
 ${s} .btn-b { background: transparent; border-color: ${alpha("#ffffff", 0.25)}; color: var(--ink); }
@@ -237,7 +237,7 @@ ${s} .chip {
 ${s} .btn-b { background: var(--surface2); border: none; color: var(--ink); }
 ${s} .logo { border-radius: 5px; }
 ${s} .topbar, ${s} .foot { border: none; }
-${s} .stat-num { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
 `;
     },
   },

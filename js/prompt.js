@@ -10,7 +10,7 @@
 import { ARCHETYPES } from "./archetypes/index.js";
 import { fontLabel, fontStack } from "./fonts.js";
 import { colorName, describeColor, onColor, contrast } from "./color.js";
-import { shadowValues, chartSpec, chartSvg } from "./render.js";
+import { shadowValues, chartSpec, chartSvg, accentTextColors } from "./render.js";
 import { motifsCss, motifNotes } from "./motifs.js";
 import { genomeKey } from "./genome.js";
 import { specimenDefinition } from "./specimens.js";
@@ -172,6 +172,7 @@ function alwaysRules(g) {
     `Set body text in ${fontShort(g.fonts.body)} and code/data labels in ${fontShort(g.fonts.mono)}, using the exact font-family stacks in the tokens.`,
     `Use ${p.accent} for primary buttons, links, and active/selected states, with ${onColor(p.accent)} text on it. Use ${p.accent2} for second data series, status dots, and alternate tags.`,
     `Use ${p.muted} for secondary text and ${p.border} for every border, rule, and divider.`,
+    `When an accent is used AS TEXT (eyebrow labels, links, deltas, status), use the contrast-safe variants ${accentTextColors(p).accentText} / ${accentTextColors(p).accent2Text} (--accent-text / --accent2-text); keep ${p.accent} / ${p.accent2} for fills. Never place text below 4.5:1 on its surface.`,
     `Give panels ${g.radius}px corners and give buttons, chips, and inputs ${controlWord(g.ctl)} corners.`,
     g.bw === 0
       ? "Draw no visible borders on panels or buttons; separate surfaces with background color and shadow."
@@ -233,6 +234,8 @@ function paletteTable(g) {
     ["Secondary accent", p.accent2, "second data series, success/status dots, alternate tags"],
     ["Border / rule", p.border, "every border, divider, table rule, chart baseline"],
     ["Text on accent", onColor(p.accent), "text placed on the primary accent"],
+    ["Accent as text", accentTextColors(p).accentText, "eyebrow labels, links, deltas, warnings (contrast-safe on page and cards)"],
+    ["Second accent as text", accentTextColors(p).accent2Text, "status text, helper text (contrast-safe)"],
     ...customPaletteRoles(g).map(([key, value]) => [`Custom ${key} color`, value, "archetype decor role used by the craft CSS"]),
   ];
   return `| Role | Hex | Plain description | Use it for |\n|---|---|---|---|\n${rows

@@ -142,11 +142,11 @@ ${s} .hero {
 }
 ${s} .hero .sub { color: ${on}; opacity: .85; }
 ${s} .hero .kicker { color: ${on}; }
-${s} .hero .btn-a { background: ${on}; color: var(--accent); }
+${s} .hero .btn-a { background: ${on}; color: var(--accent-text); }
 ${s} .hero .btn-b { border-color: ${on}; color: ${on}; }
 ${s} .display { font-size: 54px; line-height: .96; }
 ${s} .chip { border-color: var(--ink); border-width: 2px; border-radius: 0; color: var(--ink); font-weight: 700; }
-${s} .stat-num { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
 ${s} .topbar { border-bottom: 2px solid var(--ink); }
 ${s} .foot { border-top: 2px solid var(--ink); }
 ${s} .logo { border-radius: 0; background: var(--accent); }
@@ -191,7 +191,7 @@ ${s} .chip { background: var(--accent); color: ${onColor(g.p.accent)}; border: 2
 ${s} .chip:nth-child(2) { background: var(--accent2); color: ${onColor(g.p.accent2)}; }
 ${s} .btn { border: 3px solid var(--ink); box-shadow: 0 4px 0 var(--ink); font-weight: 800; }
 ${s} .display { font-size: 46px; }
-${s} .kicker { color: var(--accent); letter-spacing: .1em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .1em; }
 ${s} .logo { border: 2.5px solid var(--ink); border-radius: 50%; width: 16px; height: 16px; }
 ${s} .topbar { border-bottom-width: 3px; }
 ${s} .foot { border-top-width: 3px; }
@@ -231,15 +231,15 @@ ${s} .foot { border-top-width: 3px; }
       return `
 ${s} .card { clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%); box-shadow: none; }
 ${s} .display { text-shadow: 0 0 16px ${alpha(g.p.accent, 0.55)}; font-size: 42px; }
-${s} .kicker { font-family: var(--f-mono); color: var(--accent2); }
+${s} .kicker { font-family: var(--f-mono); color: var(--accent2-text); }
 ${s} .kicker::before { content: "// "; }
-${s} .card-t { color: var(--accent2); font-size: 12.5px; letter-spacing: .14em; }
+${s} .card-t { color: var(--accent2-text); font-size: 12.5px; letter-spacing: .14em; }
 ${s} .card-t::before { content: "▸ "; }
 ${s} .btn-a { clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%); box-shadow: 0 0 18px ${alpha(g.p.accent, 0.5)}; }
 ${s} .btn-b { border-color: var(--border); }
 ${s} .chip { border-radius: 0; font-family: var(--f-mono); font-size: 10px; text-transform: uppercase; }
-${s} .stat-num { color: var(--accent); text-shadow: 0 0 14px ${alpha(g.p.accent, 0.6)}; }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-num { color: var(--accent-text); text-shadow: 0 0 14px ${alpha(g.p.accent, 0.6)}; }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .logo { border-radius: 0; background: var(--accent); clip-path: polygon(0 0, 100% 0, 100% 65%, 65% 100%, 0 100%); }
 `;
     },
@@ -287,12 +287,12 @@ ${s} .card { border: 3px double var(--border); }
 ${s} .topbar { border-bottom: 3px double var(--border); }
 ${s} .foot { border-top: 3px double var(--border); }
 ${s} .display { font-size: 40px; line-height: 1.15; }
-${s} .kicker { color: var(--accent); letter-spacing: .3em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .3em; }
 ${s} .btn-a { color: ${g.p.bg}; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: 11px; padding: 10px 20px; }
 ${s} .btn-b { border-color: var(--border); letter-spacing: .1em; text-transform: uppercase; font-size: 11px; }
 ${s} .chip { border-color: var(--border); letter-spacing: .12em; text-transform: uppercase; font-size: 9.5px; }
 ${s} .logo { transform: rotate(45deg); border-radius: 0; width: 11px; height: 11px; }
-${s} .stat-num { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
 `;
     },
   },

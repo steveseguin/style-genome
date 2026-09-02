@@ -8,7 +8,8 @@ import { buildSample, chartSpec } from "../js/render.js";
 import { buildPrompt } from "../js/prompt.js";
 import { SPECIMENS, SPECIMEN_IDS } from "../js/specimens.js";
 import { mulberry32 } from "../js/rng.js";
-import { diverseSet, neighborSet } from "../js/evolve.js";
+import { diverseSet, neighborSet, canWear } from "../js/evolve.js";
+import { paletteLegible, paletteIssues } from "../js/a11y.js";
 import { fullStylesheet, tokensRootCss, starterCss } from "../js/starter.js";
 import { encodeGenome, decodeGenome, genomeLink, parseHash, normalizeGenome } from "../js/share.js";
 import { describeColor } from "../js/color.js";
@@ -169,6 +170,32 @@ assert.deepEqual(
   "some archetypes are unreachable across the discovery exposure probe",
 );
 
+// Legibility: every archetype's own designs pass the calibrated palette
+// check, a light-only archetype can never be handed a dark palette (the
+// white-on-white failure mode), and every tile any round produces is legible.
+for (const archetype of ARCHETYPE_LIST) {
+  const g = randomGenome(mulberry32(0xa11e), archetype.id);
+  assert.ok(paletteLegible(g), `${archetype.id}: own design fails palette legibility: ${JSON.stringify(paletteIssues(g))}`);
+}
+assert.equal(canWear("offsetcmyk", true), false, "Offset CMYK is a light-paper design and must not wear a dark palette");
+assert.equal(canWear("cosmic", false), false, "Deep Space is dark-only");
+for (let seed = 0; seed < 60; seed++) {
+  const r = mulberry32(0x1e61b1e + seed);
+  const seen = new Set(); const shown = new Set(); const likedA = new Set(); const liked = [];
+  let grid = diverseSet(r, 12, (k) => seen.has(k), null);
+  for (let round = 1; round <= 4; round++) {
+    for (const g of grid) {
+      seen.add(genomeKey(g)); shown.add(g.archetype);
+      assert.ok(paletteLegible(g), `seed ${seed} round ${round}: illegible palette on ${g.archetype}`);
+      assert.ok(canWear(g.archetype, !!g.p.dark), `seed ${seed} round ${round}: ${g.archetype} wearing a ${g.p.dark ? "dark" : "light"} palette it cannot carry`);
+    }
+    const pick = grid[Math.floor(r() * grid.length)]; liked.push(pick); likedA.add(pick.archetype);
+    if (round === 4) break;
+    const rejected = new Set([...shown].filter((a) => !likedA.has(a)));
+    grid = [pick, ...neighborSet(r, liked, 11, round + 1, (k) => seen.has(k), null, rejected)];
+  }
+}
+
 // Broadsheet was previously a fully fixed preset: every "sibling" collapsed
 // back to the same genome. Later-round raw-gene mutation must keep producing
 // distinct but recognizably Broadsheet candidates.
@@ -183,4 +210,4 @@ for (let seed = 0; seed < 32; seed++) {
 assert.ok(siblingKeys.size >= 12, `fixed-style variation regressed: only ${siblingKeys.size} unique Broadsheet siblings`);
 assert.ok(!siblingKeys.has(genomeKey(fixedBase)), "fixed-style mutation repeated the canonical Broadsheet genome");
 
-console.log(`Validated ${ids.size} archetypes, ${MOTIFS.length} motifs (${MOTIF_COMBOS.toLocaleString()} combinations), ${keys.size} genomes, ${prompts} prompts, ${renders} specimen renders, stylesheet + permalink round-trips, complete discovery exposure, and live sibling variation.`);
+console.log(`Validated ${ids.size} archetypes, ${MOTIFS.length} motifs (${MOTIF_COMBOS.toLocaleString()} combinations), ${keys.size} genomes, ${prompts} prompts, ${renders} specimen renders, stylesheet + permalink round-trips, legible palettes across 60 simulated sessions, complete discovery exposure, and live sibling variation.`);

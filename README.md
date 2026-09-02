@@ -23,6 +23,15 @@ The final style exports five artifacts:
 Mis-clicked? **Back** undoes the last pick. **Re-roll** gives a fresh set of
 parameters for the same archetype.
 
+Legibility is enforced, not hoped for (`js/a11y.js`): every sampled genome
+passes a palette contrast check calibrated to its archetype, a light-only
+archetype can never be handed a dark palette (and vice versa), every rendered
+tile is audited in the DOM and swapped if readable text falls to
+white-on-white territory, and the editor reports any remaining WCAG misses
+for the style you are tuning. Accents used as text go through contrast-safe
+`--accent-text` / `--accent2-text` tokens, which the prompt and stylesheet
+export as well.
+
 The point: AI-generated websites all converge on the same look. A few human
 gut-choices through a deliberately diverse style space land you somewhere
 specific — and the exported prompt pins an AI to that spot.

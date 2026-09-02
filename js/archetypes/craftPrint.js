@@ -112,7 +112,7 @@ ${s}::after {
   background: linear-gradient(122deg, transparent 26%, ${alpha("#ffffff", 0.11)} 42%, ${alpha("#ffffff", 0.03)} 50%, transparent 62%);
 }
 ${s} .display { color: var(--ink); font-size: 46px; text-shadow: 0 0 22px ${alpha(g.p.accent, 0.2)}; }
-${s} .kicker { color: var(--accent); letter-spacing: .18em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .18em; }
 ${s} .card {
   border: 3px solid ${lead};
   box-shadow: inset 0 0 18px ${alpha("#ffffff", 0.08)};
@@ -130,7 +130,7 @@ ${s} .btn-a {
   box-shadow: inset 0 0 10px ${alpha("#ffffff", 0.3)};
 }
 ${s} .btn-b { border: 2px solid ${lead}; color: var(--ink); }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .topbar { border-bottom-color: ${lead}; }
 ${s} .foot { border-top-color: ${lead}; }
 ${s} .logo {
@@ -187,12 +187,12 @@ ${s} {
     var(--bg);
 }
 ${s} .display { font-size: 44px; }
-${s} .kicker { color: var(--accent); letter-spacing: .16em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .16em; }
 ${s} .card { background: var(--surface); border-color: var(--border); }
 ${s} .chip { background: transparent; border: 1px solid var(--border); color: var(--muted); }
 ${s} .btn-a { background: var(--accent); color: var(--on-accent); }
 ${s} .btn-b { border-color: var(--border); }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .logo {
   border-radius: 50%;
   background: radial-gradient(circle at 34% 30%, #f2d98c 0 30%, #c79b3a 70%, #a97f24);
@@ -239,7 +239,7 @@ ${s} .display {
   background: ${foil}; -webkit-background-clip: text; background-clip: text; color: transparent;
   font-size: 47px; filter: drop-shadow(0 1px 1px rgba(70,45,110,.3)) drop-shadow(0 2px 10px ${alpha("#a96cff", 0.25)});
 }
-${s} .kicker { color: var(--accent); letter-spacing: .14em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .14em; }
 ${s} .card {
   background: ${sheen}, var(--surface); border-color: var(--border);
 }
@@ -253,7 +253,7 @@ ${s} .chip {
   box-shadow: 0 0 0 1px rgba(0,0,0,.05), 0 1px 3px rgba(30,30,50,.14);
 }
 ${s} .stat-num { background: ${foil}; -webkit-background-clip: text; background-clip: text; color: transparent; }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .logo {
   border-radius: 50%; background: ${foil};
   box-shadow: 0 0 0 1px rgba(0,0,0,.06), inset 0 0 4px rgba(255,255,255,.7);

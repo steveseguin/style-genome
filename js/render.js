@@ -4,7 +4,7 @@
 
 import { ARCHETYPES } from "./archetypes/index.js";
 import { fontStack } from "./fonts.js";
-import { alpha, mix, onColor } from "./color.js";
+import { alpha, mix, onColor, ensureContrast } from "./color.js";
 import { genomeKey } from "./genome.js";
 import { NOISE_URI, SAMPLE_BASE, SAMPLE_W, SAMPLE_H } from "./sampleBase.js";
 import { specimenMarkup } from "./specimens.js";
@@ -227,9 +227,18 @@ export function textureCss(g, s) {
   }
 }
 
+// Accents are fills first; when they carry text they are nudged until they
+// read at 3:1 on both the page and the card surface. Unchanged when already
+// legible, so only broken designs move.
+export function accentTextColors(p) {
+  const fix = (c) => ensureContrast(ensureContrast(c, p.surface, 3), p.bg, 3);
+  return { accentText: fix(p.accent), accent2Text: fix(p.accent2) };
+}
+
 export function tokensCss(g, s) {
   const p = g.p;
   const sh = shadowValues(g);
+  const { accentText, accent2Text } = accentTextColors(p);
   const caseVal = g.case === "upper" ? "uppercase" : g.case === "lower" ? "lowercase" : "none";
   return `
 ${s} {
@@ -242,6 +251,8 @@ ${s} {
   --accent2: ${p.accent2};
   --border: ${p.border};
   --on-accent: ${onColor(p.accent)};
+  --accent-text: ${accentText};
+  --accent2-text: ${accent2Text};
   --f-display: ${fontStack(g.fonts.display)};
   --f-body: ${fontStack(g.fonts.body)};
   --f-mono: ${fontStack(g.fonts.mono)};

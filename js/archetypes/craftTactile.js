@@ -61,14 +61,14 @@ ${s} .hero::after {
 }
 ${s} .smain { z-index: 2; }
 ${s} .display { font-size: 45px; }
-${s} .kicker { color: var(--accent); letter-spacing: .12em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .12em; }
 ${s} .btn-a { box-shadow: 0 4px 0 ${mix(g.p.accent, g.p.ink, 0.35)}; }
 ${s} .btn-b { background: #fff; border: none; color: var(--ink); box-shadow: 0 3px 0 ${g.p.border}; }
 ${s} .chip { border: none; color: var(--ink); font-weight: 700; background: ${mix(g.p.accent2, "#ffffff", 0.62)}; }
 ${s} .chip:nth-child(2) { background: ${mix(g.p.accent, "#ffffff", 0.62)}; }
 ${s} .chip:nth-child(3) { background: ${mix(g.p.accent2, "#ffffff", 0.4)}; }
-${s} .stat-num { color: var(--accent); }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .logo { border-radius: 50%; box-shadow: 3px 3px 0 ${g.p.accent2}; }
 ${s} .topbar { border-bottom: none; }
 ${s} .foot { border-top: none; }
@@ -122,7 +122,7 @@ ${s} .card::before {
 ${s} .card:nth-child(2)::before { transform: translateX(-50%) rotate(5deg); background: ${tape(g.p.accent2)}; }
 ${s} .card:nth-child(3)::before { transform: translateX(-50%) rotate(-2deg); background: ${tape(g.p.accent)}; }
 ${s} .display { font-size: 46px; }
-${s} .kicker { color: var(--accent); letter-spacing: .08em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .08em; }
 ${s} .chip {
   background: #fff; border: none; color: var(--ink); font-weight: 700;
   box-shadow: 0 0 0 3px #fff, 0 2px 5px ${alpha(g.p.ink, 0.2)}; transform: rotate(-2deg);
@@ -131,8 +131,8 @@ ${s} .chip:nth-child(2) { transform: rotate(1.6deg); }
 ${s} .chip:nth-child(3) { transform: rotate(-1deg); }
 ${s} .btn-a { box-shadow: 0 3px 8px ${alpha(g.p.accent, 0.4)}; }
 ${s} .btn-b { background: #fff; border: none; color: var(--ink); box-shadow: 0 2px 6px ${alpha(g.p.ink, 0.18)}; }
-${s} .stat-num { color: var(--accent); }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-num { color: var(--accent-text); }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .logo { border-radius: 50%; box-shadow: 0 0 0 3px #fff, 0 2px 4px ${alpha(g.p.ink, 0.25)}; transform: rotate(-6deg); }
 ${s} .topbar { border-bottom: none; }
 ${s} .foot { border-top: none; }
@@ -198,8 +198,8 @@ ${s} .display { font-size: 44px; }
 ${s} .btn { box-shadow: 0 3px 6px rgba(0,0,0,.28); }
 ${s} .btn-b { background: #fffdf5; border: none; color: var(--ink); }
 ${s} .chip { background: #fffdf5; border: none; color: var(--ink); }
-${s} .stat-num { color: var(--accent); }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .logo { border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff 0 18%, ${g.p.accent} 70%); }
 ${s} .topbar { border-bottom: none; }
 ${s} .foot { border-top: none; }
@@ -251,13 +251,13 @@ ${s} .display {
   border-bottom: 2px dashed ${chalk}; padding-bottom: 8px; align-self: flex-start;
   font-size: 44px; text-shadow: 0 0 5px ${alpha("#ffffff", 0.4)};
 }
-${s} .kicker { color: var(--accent); letter-spacing: .14em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .14em; }
 ${s} .chip { background: transparent; border: 1.5px dashed ${chalkSoft}; color: var(--ink); border-radius: 2px; }
 ${s} .btn { box-shadow: none; }
 ${s} .btn-b { background: transparent; border: 2px solid ${alpha("#ffffff", 0.6)}; color: var(--ink); }
 ${s} .btn-a { background: #f3f1e7; color: ${g.p.bg}; border: 2px solid #f3f1e7; text-shadow: none; }
-${s} .stat-num { color: var(--accent2); }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-num { color: var(--accent2-text); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .card-p { color: var(--muted); }
 ${s} .logo { background: #f3f1e7; border-radius: 1px; box-shadow: 0 0 5px ${alpha("#ffffff", 0.4)}; }
 ${s} .topbar { border-bottom: 2px dashed ${chalkSoft}; }

@@ -37,16 +37,16 @@ export const uiSystemGaps = [
 ${s} { background-color: ${g.p.bg}; background-image: repeating-linear-gradient(6deg, rgba(255,255,255,.025) 0 2px, rgba(0,0,0,.045) 2px 4px, transparent 4px 13px); }
 ${s} .topbar, ${s} .foot { color: #eadfc8; background: linear-gradient(180deg, #44352a, #241b16); border-color: #17110d; box-shadow: inset 0 1px 0 rgba(255,255,255,.2), inset 0 -3px 6px rgba(0,0,0,.55); outline: 1px dashed rgba(222,191,140,.4); outline-offset: -6px; }
 ${s} .topnav .nl, ${s} .brand, ${s} .foot { color: #eadfc8; }
-${s} .hero { background: ${alpha(g.p.surface,.9)}; border: 1px solid #a48c65; border-radius: 7px; padding: 22px; box-shadow: inset 0 1px 0 #fff8e8, 0 4px 10px rgba(35,20,10,.35); }
+${s} .hero { background: ${alpha(g.p.surface,.9)}; color: #3a2a17; --ink: #3a2a17; --muted: #6b5640; --accent-text: #7a4a14; --accent2-text: #3f5a45; border: 1px solid #a48c65; border-radius: 7px; padding: 22px; box-shadow: inset 0 1px 0 #fff8e8, 0 4px 10px rgba(35,20,10,.35); }
 ${s} .display { font-size: 43px; color: #302318; text-shadow: 0 1px 0 #fff; }
-${s} .kicker { color: var(--accent); }
-${s} .card { position: relative; background: linear-gradient(180deg, #f5ead2, #dfd0b2); border-color: #8b7451; box-shadow: inset 0 1px 0 #fff9e9, inset 0 -2px 4px rgba(70,45,20,.18), 0 5px 10px rgba(40,22,10,.3); }
+${s} .kicker { color: var(--accent-text); }
+${s} .card { position: relative; color: #3a2a17; --ink: #3a2a17; --muted: #6b5640; --accent-text: #7a4a14; --accent2-text: #3f5a45; background: linear-gradient(180deg, #f5ead2, #dfd0b2); border-color: #8b7451; box-shadow: inset 0 1px 0 #fff9e9, inset 0 -2px 4px rgba(70,45,20,.18), 0 5px 10px rgba(40,22,10,.3); }
 ${s} .card::after { content: ""; position: absolute; right: 8px; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff4ad 0 12%, #b77d32 48%, #5d391b 100%); }
 ${s} .btn { border: 1px solid #61411f; text-shadow: 0 1px 0 rgba(255,255,255,.45); }
 ${s} .btn-a { background: linear-gradient(180deg, #d9a75a 0, #a96f2f 52%, #744619 100%); color: #28180b; box-shadow: inset 0 1px 0 #ffe2a0, 0 2px 3px rgba(35,20,8,.5); }
 ${s} .btn-b { background: linear-gradient(180deg, #f3e8d0, #cdbb98); color: var(--ink); box-shadow: inset 0 1px 0 #fff; }
 ${s} .chip { background: #ded0b4; border-color: #8b7451; box-shadow: inset 0 1px 2px rgba(55,35,15,.18); }
-${s} .stat-num { color: var(--accent2); text-shadow: 0 1px 0 #fff; }
+${s} .stat-num { color: var(--accent2-text); text-shadow: 0 1px 0 #fff; }
 ${s} .chart rect { filter: drop-shadow(0 1px 0 rgba(255,255,255,.65)); }
 ${s} .logo { background: radial-gradient(circle at 34% 28%, #dcefd8 0 13%, var(--accent2) 55%, #21382a 100%); border: 1px solid #1b2c20; }
 `;
@@ -82,7 +82,7 @@ ${s} .logo { background: radial-gradient(circle at 34% 28%, #dcefd8 0 13%, var(-
       return `
 ${s} .topbar { border: none; }
 ${s} .display { font-size: 56px; font-weight: 400; line-height: 1; }
-${s} .kicker { color: var(--accent); font-size: 12px; letter-spacing: .04em; }
+${s} .kicker { color: var(--accent-text); font-size: 12px; letter-spacing: .04em; }
 ${s} .topnav .nl { padding-bottom: 4px; }
 ${s} .topnav .nl.on { color: var(--ink); border-bottom: 2px solid var(--accent); }
 ${s} .cards { grid-template-columns: 1.15fr .85fr 1fr; gap: 8px; }
@@ -96,7 +96,7 @@ ${s} .chip { border: none; border-radius: 0; background: rgba(255,255,255,.18); 
 ${s} .btn { border: none; border-radius: 0; }
 ${s} .btn-a { background: var(--accent); color: #fff; }
 ${s} .btn-b { background: var(--ink); color: var(--bg); }
-${s} .stat-num { color: var(--accent2); font-weight: 400; }
+${s} .stat-num { color: var(--accent2-text); font-weight: 400; }
 ${s} .logo { border-radius: 0; background: linear-gradient(90deg, var(--accent) 47%, transparent 47% 53%, var(--accent) 53%); }
 ${s} .foot { border-top: none; }
 `;
@@ -132,15 +132,15 @@ ${s} .foot { border-top: none; }
       return `
 ${s} .topbar { background: var(--surface); border: none; box-shadow: 0 2px 5px rgba(0,0,0,.22); margin: 0; padding: 15px calc(var(--sp) * 3); }
 ${s} .display { font-size: 48px; font-weight: 500; line-height: 1.05; }
-${s} .kicker { color: var(--accent); letter-spacing: .08em; font-weight: 500; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .08em; font-weight: 500; }
 ${s} .card { border: none; background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.18), 0 1px 2px rgba(0,0,0,.12); }
 ${s} .card:hover { box-shadow: 0 4px 8px rgba(0,0,0,.2); }
 ${s} .card-t { font-weight: 500; }
 ${s} .chip { border: none; background: var(--surface2); font-weight: 500; }
 ${s} .btn { border: none; text-transform: uppercase; letter-spacing: .045em; font-weight: 600; }
 ${s} .btn-a { background: var(--accent); color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.28); }
-${s} .btn-b { background: transparent; color: var(--accent); box-shadow: none; }
-${s} .stat-num { color: var(--accent); font-weight: 500; }
+${s} .btn-b { background: transparent; color: var(--accent-text); box-shadow: none; }
+${s} .stat-num { color: var(--accent-text); font-weight: 500; }
 ${s} .logo { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); box-shadow: 0 3px 6px rgba(0,0,0,.32); }
 ${s} .foot { border-top-color: var(--border); }
 `;
@@ -177,12 +177,12 @@ ${s} .foot { border-top-color: var(--border); }
 ${s} { background: radial-gradient(520px 330px at 92% 0%, ${alpha(g.p.accent,.18)}, transparent 70%), radial-gradient(480px 340px at 0% 100%, ${alpha(g.p.accent2,.12)}, transparent 72%), var(--bg); }
 ${s} .topbar { background: ${glass}; border-color: ${alpha(g.p.ink,.12)}; backdrop-filter: blur(18px) saturate(125%); }
 ${s} .display { font-size: 48px; font-weight: 600; }
-${s} .kicker { color: var(--accent); letter-spacing: .08em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .08em; }
 ${s} .card { background: ${glass}; border-color: ${alpha(g.p.ink,.16)}; box-shadow: inset 1px 1px 0 ${alpha("#ffffff", g.p.dark ? .1 : .72)}, 0 6px 18px rgba(20,28,42,.12); backdrop-filter: blur(16px) saturate(120%); }
 ${s} .chip { background: ${alpha(g.p.ink,.07)}; border-color: ${alpha(g.p.ink,.12)}; }
 ${s} .btn-a { background: var(--accent); color: #fff; box-shadow: 0 2px 6px ${alpha(g.p.accent,.25)}; }
 ${s} .btn-b { background: ${glass}; border-color: ${alpha(g.p.ink,.16)}; }
-${s} .stat-num { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
 ${s} .logo { background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 4px; box-shadow: inset 1px 1px 0 rgba(255,255,255,.45); }
 ${s} .foot { border-top-color: ${alpha(g.p.ink,.14)}; }
 `;

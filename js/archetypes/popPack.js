@@ -48,13 +48,13 @@ ${s} .chip {
   background: ${mix(g.p.accent, "#ffffff", 0.82)};
   border-color: ${mix(g.p.accent, "#ffffff", 0.5)}; color: var(--ink); font-weight: 600;
 }
-${s} .chip::before { content: "♡ "; color: var(--accent); }
+${s} .chip::before { content: "♡ "; color: var(--accent-text); }
 ${s} .btn-a { box-shadow: 0 5px 12px ${alpha(g.p.accent, 0.4)}; font-weight: 700; }
 ${s} .btn-b { border-color: var(--ink); color: var(--ink); }
 ${s} .logo { background: transparent; width: auto; height: auto; border-radius: 0; }
-${s} .logo::before { content: "✿"; color: var(--accent); font-size: 16px; line-height: 1; }
-${s} .stat-num { color: var(--accent); }
-${s} .stat-delta { color: var(--accent2); }
+${s} .logo::before { content: "✿"; color: var(--accent-text); font-size: 16px; line-height: 1; }
+${s} .stat-num { color: var(--accent-text); }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .topbar { border-bottom-color: var(--ink); }
 ${s} .foot { border-top-color: var(--ink); }
 `;
@@ -90,16 +90,16 @@ ${s} .foot { border-top-color: var(--ink); }
     css(s, g) {
       return `
 ${s} { background: #000000; }
-${s} .display { color: var(--accent); transform: skewX(-8deg); font-size: 58px; line-height: 0.92; }
-${s} .kicker { color: var(--accent2); }
-${s} .kicker::before { content: "☻ "; color: var(--accent2); }
-${s} .card-t { color: var(--accent); }
+${s} .display { color: var(--accent-text); transform: skewX(-8deg); font-size: 58px; line-height: 0.92; }
+${s} .kicker { color: var(--accent2-text); }
+${s} .kicker::before { content: "☻ "; color: var(--accent2-text); }
+${s} .card-t { color: var(--accent-text); }
 ${s} .card:nth-child(2) {
   background: ${g.p.accent}; border-color: ${g.p.accent}; color: #0a0a0a;
-  --ink: #0a0a0a; --accent: #0a0a0a; --accent2: #0a0a0a; --muted: #222222;
+  --ink: #0a0a0a; --accent: #0a0a0a; --accent2: #0a0a0a; --accent-text: #0a0a0a; --accent2-text: #0a0a0a; --muted: #222222;
 }
 ${s} .btn-a { background: var(--accent); color: #0a0a0a; box-shadow: none; font-weight: 800; }
-${s} .btn-b { background: transparent; color: var(--accent2); border-color: #333333; }
+${s} .btn-b { background: transparent; color: var(--accent2-text); border-color: #333333; }
 ${s} .chip {
   font-family: var(--f-mono); text-transform: uppercase; font-size: 9.5px;
   letter-spacing: .12em; border-color: #333333; border-radius: 0; color: var(--muted);
@@ -160,7 +160,7 @@ ${s} .chip {
   border: 1px solid ${stencil}; border-radius: 0; text-transform: uppercase;
   font-family: var(--f-mono); letter-spacing: .1em; font-size: 10px; color: ${paperInk};
 }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .btn-a {
   background: var(--accent); color: var(--ink);
   box-shadow: 3px 3px 0 ${alpha("#000000", 0.45)}; transform: rotate(-1.2deg);
@@ -219,7 +219,7 @@ ${s} .card:nth-child(2) { background: ${g.p.surface2}; transform: rotate(1deg); 
 ${s} .card:nth-child(3) { background: ${g.p.paper3}; transform: rotate(-0.7deg); border-radius: 4px 12px 2px 14px; }
 ${s} .card-t { color: var(--ink); }
 ${s} .stat-num { color: var(--ink); }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .chip {
   background: #ffffff; border: none; border-radius: 8px 3px 9px 2px;
   transform: rotate(-2deg); color: var(--ink); font-weight: 600;

@@ -56,16 +56,16 @@ ${s} .card:nth-child(1) { border-radius: 110px 110px 14px 14px; }
 ${s} .card:nth-child(2) { border-radius: 88px 88px 14px 14px; }
 ${s} .card:nth-child(3) { border-radius: 14px 110px 14px 14px; }
 ${s} .display { font-size: 44px; }
-${s} .kicker { color: var(--accent); letter-spacing: .14em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .14em; }
 ${s} .sub { color: var(--muted); }
 ${s} .btn-a { background: var(--accent); color: #ffffff; }
 ${s} .btn-b { border-color: var(--border); color: var(--ink); }
 ${s} .chip { background: ${mix(g.p.accent, "#ffffff", 0.82)}; border-color: transparent; color: ${mix(g.p.accent, g.p.ink, 0.35)}; }
-${s} .stat-num { color: var(--accent); }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .card-t { color: var(--ink); }
 ${s} .logo { border-radius: 50% 50% 50% 0; background: linear-gradient(135deg, ${g.p.accent}, ${gold}); }
-${s} .topnav .nl.on { color: var(--accent); }
+${s} .topnav .nl.on { color: var(--accent-text); }
 ${s} .topbar { border-bottom-color: var(--border); }
 ${s} .foot { border-top-color: var(--border); }
 `;
@@ -112,11 +112,11 @@ ${s} .card {
   padding: calc(var(--sp) * 2.1);
 }
 ${s} .display { font-size: 42px; }
-${s} .kicker { color: var(--accent); letter-spacing: .18em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .18em; }
 ${s} .card-t { color: var(--ink); }
 ${s} .card-p { color: var(--muted); }
 ${s} .stat-num {
-  color: var(--accent); font-family: var(--f-mono);
+  color: var(--accent-text); font-family: var(--f-mono);
   background: ${alpha("#000000", 0.32)}; border: 1px solid var(--border);
   border-radius: 3px; padding: 2px 9px; align-self: flex-start; letter-spacing: .04em;
 }
@@ -242,10 +242,10 @@ ${s} .card-p {
   background: repeating-linear-gradient(180deg, transparent 0 18px, ${alpha("#ffffff", 0.03)} 18px 36px);
 }
 ${s} .display { font-size: 38px; letter-spacing: -.01em; }
-${s} .kicker { color: var(--accent); font-family: var(--f-mono); letter-spacing: .06em; }
+${s} .kicker { color: var(--accent-text); font-family: var(--f-mono); letter-spacing: .06em; }
 ${s} .kicker::after { content: " ● LIVE"; color: ${green}; }
 ${s} .sub { color: var(--muted); }
-${s} .stat-num { color: var(--accent); font-family: var(--f-mono); font-size: 34px; }
+${s} .stat-num { color: var(--accent-text); font-family: var(--f-mono); font-size: 34px; }
 ${s} .stat-label { color: var(--muted); }
 ${s} .stat-delta { color: ${green}; }
 ${s} .chip { border-color: var(--border); color: var(--muted); font-family: var(--f-mono); font-size: 10px; border-radius: 0; }

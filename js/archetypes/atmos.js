@@ -59,7 +59,7 @@ ${s} .chip { border-color: var(--border); color: var(--muted); }
 ${s} .btn-a { background: #e9e9ed; color: #0a0a0b; box-shadow: none; }
 ${s} .btn-b { border-color: #46464c; color: var(--ink); }
 ${s} .stat-num { color: #ededf0; font-weight: 500; }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .spark polyline { stroke: #c9cace; }
 ${s} .chart polyline { stroke: #d7d8dc; }
 ${s} .chart circle { fill: #d7d8dc; }
@@ -109,7 +109,7 @@ ${s} .card::before {
   content: ""; position: absolute; inset: 6px; border: 1px solid var(--border);
   border-radius: 1px; pointer-events: none;
 }
-${s} .kicker { font-style: italic; text-transform: lowercase; letter-spacing: .01em; font-weight: 400; font-size: 13px; color: var(--accent2); }
+${s} .kicker { font-style: italic; text-transform: lowercase; letter-spacing: .01em; font-weight: 400; font-size: 13px; color: var(--accent2-text); }
 ${s} .display { font-weight: 500; font-size: 46px; line-height: 1.08; }
 ${s} .sub { color: var(--muted); }
 ${s} .card-t { font-weight: 500; font-size: 16px; }
@@ -120,7 +120,7 @@ ${s} .chip {
 ${s} .btn-a { background: var(--accent); color: #ecdcb8; box-shadow: var(--shadow-btn); }
 ${s} .btn-b { border-color: var(--border); color: var(--ink); }
 ${s} .stat-num { color: var(--ink); font-weight: 500; }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .spark polyline { stroke: var(--accent2); }
 ${s} .chart polyline { stroke: var(--accent2); }
 ${s} .chart circle { fill: var(--accent2); }
@@ -166,7 +166,7 @@ ${s} .card { border-color: var(--ink); background: var(--surface); box-shadow: 0
 ${s} .card-t { position: relative; padding-right: 52px; font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; }
 ${s} .card-t::after { content: ""; position: absolute; top: 2px; right: 0; width: 40px; height: 10px; background: ${vent}; }
 ${s} .display { font-size: 44px; letter-spacing: .01em; }
-${s} .kicker { font-family: var(--f-mono); color: var(--accent); letter-spacing: .12em; }
+${s} .kicker { font-family: var(--f-mono); color: var(--accent-text); letter-spacing: .12em; }
 ${s} .sub { color: var(--muted); }
 ${s} .topbar { background: var(--surface2); border-bottom-color: var(--ink); }
 ${s} .brand { font-family: var(--f-mono); letter-spacing: .12em; }
@@ -179,7 +179,7 @@ ${s} .stat-num {
   background: #1c160d; color: #f0a828; border-radius: 4px; padding: 4px 12px;
   box-shadow: inset 0 2px 5px rgba(0,0,0,.6);
 }
-${s} .stat-delta { font-family: var(--f-mono); color: var(--accent2); font-size: 11px; }
+${s} .stat-delta { font-family: var(--f-mono); color: var(--accent2-text); font-size: 11px; }
 ${s} .chip { border-radius: 3px; border: 1px solid var(--ink); background: var(--surface2); color: var(--ink); font-family: var(--f-mono); font-size: 10px; }
 ${s} .foot { border-top-color: var(--ink); font-family: var(--f-mono); text-transform: uppercase; font-size: 10.5px; letter-spacing: .06em; }
 ${s} .logo { border-radius: 2px; background: var(--accent); }
@@ -220,15 +220,15 @@ ${s} .logo { border-radius: 2px; background: var(--accent); }
     css(s, g) {
       return `
 ${s} .display {
-  font-family: var(--f-display); font-weight: 400; font-size: 54px; line-height: 1.1; color: var(--accent);
+  font-family: var(--f-display); font-weight: 400; font-size: 54px; line-height: 1.1; color: var(--accent-text);
   text-shadow: 0 0 6px ${alpha(g.p.accent, 0.9)}, 0 0 18px ${alpha(g.p.accent, 0.55)}, 0 0 42px ${alpha(g.p.accent, 0.3)};
 }
 ${s} .kicker {
-  font-family: var(--f-display); text-transform: none; font-size: 16px; letter-spacing: .02em; color: var(--accent2);
+  font-family: var(--f-display); text-transform: none; font-size: 16px; letter-spacing: .02em; color: var(--accent2-text);
   text-shadow: 0 0 5px ${alpha(g.p.accent2, 0.8)}, 0 0 14px ${alpha(g.p.accent2, 0.4)};
 }
 ${s} .sub { color: var(--muted); }
-${s} .btn { background: transparent; border: 1.5px solid ${alpha("#ffffff", 0.28)}; color: var(--accent); box-shadow: none; text-shadow: 0 0 6px ${alpha(g.p.accent, 0.6)}; }
+${s} .btn { background: transparent; border: 1.5px solid ${alpha("#ffffff", 0.28)}; color: var(--accent-text); box-shadow: none; text-shadow: 0 0 6px ${alpha(g.p.accent, 0.6)}; }
 ${s} .btn-a {
   border-color: ${alpha("#ffffff", 0.5)}; text-shadow: 0 0 8px ${alpha(g.p.accent, 0.85)};
   box-shadow: 0 0 16px ${alpha(g.p.accent, 0.35)}, inset 0 0 10px ${alpha(g.p.accent, 0.12)};
@@ -237,7 +237,7 @@ ${s} .card { background: var(--surface); border-color: var(--border); box-shadow
 ${s} .card-t { color: var(--ink); font-weight: 600; }
 ${s} .chip { border-color: var(--border); color: var(--muted); }
 ${s} .stat-num { color: var(--ink); }
-${s} .stat-delta { color: var(--accent2); text-shadow: 0 0 8px ${alpha(g.p.accent2, 0.5)}; }
+${s} .stat-delta { color: var(--accent2-text); text-shadow: 0 0 8px ${alpha(g.p.accent2, 0.5)}; }
 ${s} .spark polyline { stroke: var(--accent); }
 ${s} .spark { filter: drop-shadow(0 0 3px ${alpha(g.p.accent, 0.7)}); }
 ${s} .chart polyline { stroke: var(--accent); }

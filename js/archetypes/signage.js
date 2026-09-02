@@ -52,16 +52,16 @@ ${s} .topnav .nl { color: #bdbdbd; }
 ${s} .topnav .nl.on { color: #fff; }
 ${s} .topbar .btn-b { border: 2px solid #fff; color: #fff; }
 ${s} .kicker { color: var(--ink); font-size: 13px; letter-spacing: 0; text-transform: none; font-weight: 800; }
-${s} .kicker::before { content: "→ "; color: var(--accent); font-size: 18px; line-height: 0; }
+${s} .kicker::before { content: "→ "; color: var(--accent-text); font-size: 18px; line-height: 0; }
 ${s} .display { font-size: 58px; letter-spacing: -0.04em; line-height: .96; }
 ${s} .sub { color: var(--ink); font-weight: 500; }
 ${s} .card { border: none; background: var(--surface2); border-radius: 4px; }
-${s} .card:nth-child(1) { background: var(--accent); color: ${on}; }
+${s} .card:nth-child(1) { background: var(--accent); color: ${on}; --ink: ${on}; --muted: ${on}; --accent-text: ${on}; --accent2-text: ${on}; }
 ${s} .card:nth-child(1) .card-t, ${s} .card:nth-child(1) .card-p, ${s} .card:nth-child(1) .stat-label, ${s} .card:nth-child(1) .stat-num, ${s} .card:nth-child(1) .stat-delta, ${s} .card:nth-child(1) .meta { color: ${on}; }
 ${s} .card:nth-child(1) .chip { border-color: ${on}; color: ${on}; }
-${s} .card:nth-child(2) { background: #111; color: #fff; }
+${s} .card:nth-child(2) { background: #111; color: #fff; --ink: #ffffff; --muted: #d6d6d6; --accent-text: #ffffff; --accent2-text: #ffffff; }
 ${s} .card:nth-child(2) .card-t, ${s} .card:nth-child(2) .stat-label, ${s} .card:nth-child(2) .stat-num, ${s} .card:nth-child(2) .card-p, ${s} .card:nth-child(2) .meta { color: #fff; }
-${s} .card:nth-child(2) .stat-delta { color: var(--accent2); }
+${s} .card:nth-child(2) .stat-delta { color: var(--accent2-text); }
 ${s} .card:nth-child(2) .chip { border-color: #fff; color: #fff; }
 ${s} .chip { border: 2px solid var(--ink); border-radius: 6px; font-weight: 800; color: var(--ink); text-transform: uppercase; font-size: 10px; letter-spacing: .04em; }
 ${s} .btn { border-radius: 4px; font-weight: 800; }
@@ -106,7 +106,7 @@ ${s} .display {
   background: repeating-linear-gradient(0deg, var(--surface) 0 24px, var(--bg) 24px 26px, var(--surface) 26px 50px);
   color: var(--ink); -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
-${s} .kicker { color: var(--accent); font-family: var(--f-mono); letter-spacing: .2em; }
+${s} .kicker { color: var(--accent-text); font-family: var(--f-mono); letter-spacing: .2em; }
 ${s} .card { border-color: var(--border); background: var(--surface); }
 ${s} .card-t { letter-spacing: .12em; font-size: 12px; color: var(--muted); }
 ${s} .chip {
@@ -116,15 +116,15 @@ ${s} .chip {
 ${s} .btn { border-radius: 2px; text-transform: uppercase; letter-spacing: .12em; font-family: var(--f-display); font-size: 12px; }
 ${s} .btn-a { background: var(--accent); color: #111; }
 ${s} .btn-b { border-color: var(--border); }
-${s} .stat-num { color: var(--accent); font-family: var(--f-mono); letter-spacing: .1em; }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-num { color: var(--accent-text); font-family: var(--f-mono); letter-spacing: .1em; }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .stat-delta::before { content: "● "; }
 ${s} .logo { border-radius: 2px; background: var(--accent); height: 10px; width: 18px; }
 ${s} .topbar { background: var(--surface); border-bottom-color: var(--border); }
 ${s} .topnav .nl { text-transform: uppercase; letter-spacing: .1em; font-size: 11px; font-family: var(--f-display); }
 ${s} .foot { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .1em; font-size: 10px; border-top-color: var(--border); }
 ${s} .data-table tbody tr:nth-child(odd) td { background: var(--surface2); }
-${s} .status.ok { color: var(--accent2); }
+${s} .status.ok { color: var(--accent2-text); }
 `;
     },
   },
@@ -174,7 +174,7 @@ ${s} .chip::after { content: " ]"; color: var(--muted); }
 ${s} .btn { border-radius: 0; text-transform: uppercase; letter-spacing: .08em; font-size: 11.5px; }
 ${s} .btn-a { background: var(--accent); color: #fff; box-shadow: none; }
 ${s} .btn-b { border: 1px solid var(--ink); }
-${s} .stat-num { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
 ${s} .stat-delta { color: var(--ink); }
 ${s} .foot { border-top: none; flex-direction: column; align-items: center; gap: 6px; padding-top: 4px; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; }
 ${s} .foot::before {
@@ -233,7 +233,7 @@ ${s} .chip::before { content: "[ "; }
 ${s} .chip::after { content: " ]"; }
 ${s} .btn { border-radius: 0; text-transform: uppercase; letter-spacing: .12em; font-family: var(--f-display); font-weight: 900; font-size: 12px; }
 ${s} .btn-b { border: 2px solid var(--ink); }
-${s} .stat-num { color: var(--accent); font-size: 40px; }
+${s} .stat-num { color: var(--accent-text); font-size: 40px; }
 ${s} .stat-delta { color: var(--ink); }
 ${s} .topbar { border-bottom: 3px double var(--ink); }
 ${s} .foot { border-top: 3px double var(--ink); justify-content: center; gap: 24px; text-transform: uppercase; letter-spacing: .12em; font-size: 10px; color: var(--ink); }
@@ -285,7 +285,7 @@ ${s} .btn { border-radius: 0; text-transform: uppercase; letter-spacing: .1em; f
 ${s} .btn-a { background: var(--ink); color: var(--bg); box-shadow: none; }
 ${s} .btn-b { border: 2px solid var(--ink); }
 ${s} .stat-num { font-family: var(--f-mono); }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .topbar { border-bottom: 2px solid var(--ink); }
 ${s} .foot { border-top: 2px dashed var(--ink); font-family: var(--f-mono); text-transform: uppercase; font-size: 9.5px; letter-spacing: .08em; color: var(--ink); }
 ${s} .logo { border-radius: 0; background: var(--ink); }
@@ -338,7 +338,7 @@ ${s} .chip { border: none; background: var(--surface2); color: var(--ink); borde
 ${s} .logo { border-radius: 0; background: var(--accent); width: 18px; height: 10px; }
 ${s} .topbar { border-bottom: none; background: var(--surface2); }
 ${s} .foot { border-top: none; background: var(--surface2); color: var(--ink); }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .stat-num { letter-spacing: -0.03em; }
 ${s} .media-block, ${s} .code-block, ${s} .alert { border: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.09); }
 `;

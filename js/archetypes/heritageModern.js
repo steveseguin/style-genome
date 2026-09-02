@@ -56,8 +56,8 @@ ${s} .smain { z-index: 2; }
 ${s} .chip { border-radius: 0; border: 2px solid var(--ink); color: var(--ink); font-weight: 700; }
 ${s} .btn-a { background: var(--accent); color: #ffffff; }
 ${s} .btn-b { border-color: var(--ink); }
-${s} .stat-num { color: var(--accent2); }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-num { color: var(--accent2-text); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .chart rect { fill: var(--accent2); stroke: var(--ink); stroke-width: 2; }
 ${s} .chart rect:nth-of-type(3n+2) { fill: #f4c400; }
 ${s} .chart rect:nth-of-type(3n) { fill: var(--accent); }
@@ -107,12 +107,12 @@ ${s} .kicker {
 }
 ${s} .display { font-size: 54px; line-height: .92; }
 ${s} .card { border-color: var(--ink); }
-${s} .card-t { color: var(--accent); }
+${s} .card-t { color: var(--accent-text); }
 ${s} .chip { border-radius: 0; border-color: var(--ink); color: var(--ink); font-weight: 700; text-transform: uppercase; font-size: 10px; }
 ${s} .btn-a { background: var(--accent); color: #ffffff; }
 ${s} .btn-b { border-color: var(--ink); color: var(--ink); }
-${s} .stat-num { color: var(--accent); }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .logo { border-radius: 0; background: var(--accent); }
 ${s} .topbar { border-bottom-color: var(--ink); }
 ${s} .foot { border-top-color: var(--ink); }
@@ -156,13 +156,13 @@ ${s} {
   background-size: 9px 9px;
 }
 ${s} .display { font-size: 50px; text-shadow: 4px 4px 0 var(--accent); }
-${s} .kicker { color: var(--accent); font-weight: 800; letter-spacing: .1em; }
+${s} .kicker { color: var(--accent-text); font-weight: 800; letter-spacing: .1em; }
 ${s} .card { border-color: var(--ink); background: var(--surface); }
 ${s} .card-t { letter-spacing: .01em; }
 ${s} .chip { background: #f6d01a; color: var(--ink); border: 2px solid var(--ink); font-weight: 800; }
 ${s} .btn { border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
 ${s} .btn-b { background: var(--surface); color: var(--ink); }
-${s} .stat-num { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
 ${s} .stat-delta { color: var(--ink); }
 ${s} .chart rect { stroke: var(--ink); stroke-width: 2; }
 ${s} .logo { border: 2px solid var(--ink); border-radius: 50%; width: 15px; height: 15px; }
@@ -215,17 +215,17 @@ ${s} {
     ${alpha(g.p.accent2, 0.12)} 22px 44px);
 }
 ${s} .display {
-  color: var(--accent); font-size: 48px; transform: rotate(-2deg);
+  color: var(--accent-text); font-size: 48px; transform: rotate(-2deg);
   text-decoration: underline wavy var(--accent2); text-underline-offset: 7px;
 }
-${s} .kicker { color: var(--accent2); letter-spacing: .18em; }
+${s} .kicker { color: var(--accent2-text); letter-spacing: .18em; }
 ${s} .card { background: var(--surface); border-radius: 24px 10px 22px 12px; }
 ${s} .card:nth-child(2) { border-radius: 10px 24px 12px 22px; }
 ${s} .card:nth-child(3) { border-radius: 20px 12px 26px 10px; }
 ${s} .chip { background: ${alpha(g.p.accent, 0.16)}; border-color: transparent; color: var(--ink); font-weight: 600; }
 ${s} .btn-a { background: linear-gradient(90deg, var(--accent), var(--accent2)); color: #ffffff; border: none; }
-${s} .stat-num { color: var(--accent); }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-num { color: var(--accent-text); }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .logo { border-radius: 50%; background: radial-gradient(circle at 35% 30%, var(--accent2), var(--accent)); }
 `;
     },

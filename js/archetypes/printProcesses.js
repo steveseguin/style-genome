@@ -125,7 +125,7 @@ ${s} .logo { border-radius: 48% 52% 45% 55%; background: var(--ink); }
       return `
 ${s} { background: radial-gradient(ellipse at 70% 45%, ${alpha(g.p.ink, 0.13)}, transparent 36%), radial-gradient(ellipse at 12% 80%, ${alpha(g.p.accent, 0.08)}, transparent 28%), var(--bg); }
 ${s} .display { font-size: 50px; font-style: italic; font-weight: 400; }
-${s} .kicker, ${s} .stat-delta { color: var(--accent); }
+${s} .kicker, ${s} .stat-delta { color: var(--accent-text); }
 ${s} .card { background: ${alpha(g.p.surface, 0.76)}; border-color: var(--border); box-shadow: inset 0 0 24px rgba(0,0,0,.38); }
 ${s} .btn-a { background: var(--ink); color: var(--bg); }
 ${s} .btn-b { border-color: var(--muted); }
@@ -167,7 +167,7 @@ ${s} .hero::after { content: ""; position: absolute; right: 1%; top: 4%; width: 
 ${s} .display { font-size: 47px; line-height: .98; text-shadow: 2px 0 0 var(--ink); }
 ${s} .card { background: var(--surface); border: 3px solid var(--ink); box-shadow: none; }
 ${s} .card:nth-child(2) { transform: rotate(.35deg); }
-${s} .kicker, ${s} .stat-delta { color: var(--accent); }
+${s} .kicker, ${s} .stat-delta { color: var(--accent-text); }
 ${s} .btn { border: 3px solid var(--ink); box-shadow: none; }
 ${s} .btn-a { background: var(--ink); color: var(--bg); }
 ${s} .chip { border: 2px solid var(--ink); border-radius: 0; background: transparent; font-weight: 800; }
@@ -213,7 +213,7 @@ ${s} .card:nth-child(2) { background: ${mix(g.p.accent, g.p.bg, 0.78)}; }
 ${s} .btn { border: 2px solid var(--ink); }
 ${s} .btn-a { background: var(--accent); color: var(--on-accent); }
 ${s} .chip { border-radius: 55% 45% 52% 48%; border: 2px solid var(--ink); color: var(--ink); }
-${s} .kicker, ${s} .stat-delta { color: var(--accent); }
+${s} .kicker, ${s} .stat-delta { color: var(--accent-text); }
 ${s} .logo { border-radius: 44% 56% 38% 62%; background: var(--accent); box-shadow: 3px 1px 0 var(--ink); }
 `;
     },
@@ -309,8 +309,8 @@ ${s} .card { background: transparent; border: 2px solid var(--ink); box-shadow: 
 ${s} .card:nth-child(2) { background: ${alpha(g.p.accent, 0.16)}; }
 ${s} .btn-a { background: var(--accent); color: var(--on-accent); border-color: var(--ink); box-shadow: 3px 2px 0 var(--accent2); }
 ${s} .btn-b, ${s} .chip { border: 2px solid var(--ink); border-radius: 0; }
-${s} .kicker { color: var(--accent2); }
-${s} .stat-delta { color: var(--accent); }
+${s} .kicker { color: var(--accent2-text); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .logo { border-radius: 50%; background: var(--accent); box-shadow: 3px 2px 0 var(--accent2); }
 `;
     },
@@ -395,7 +395,7 @@ ${s} .btn-a { background: var(--ink); color: var(--bg); }
 ${s} .btn-b { border-color: var(--ink); }
 ${s} .chip { border: none; border-bottom: 1px solid var(--border); border-radius: 0; padding-inline: 2px; }
 ${s} .logo { border-radius: 0; background: var(--accent); transform: rotate(-3deg); box-shadow: inset 0 0 0 1px ${alpha("#ffffff", 0.18)}; }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-delta { color: var(--accent-text); }
 `;
     },
   },

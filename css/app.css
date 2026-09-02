@@ -252,6 +252,12 @@ a.tile-usebtn { text-decoration: none; white-space: nowrap; }
 .fin-head { margin: 2px 0 12px; }
 .fin-name { font-size: 21px; margin: 0 0 4px; letter-spacing: -0.01em; }
 .fin-blurb { margin: 0; color: var(--app-muted); font-size: 13.5px; line-height: 1.5; max-width: 84ch; }
+.fin-a11y { margin: 6px 0 0; font-size: 12.5px; line-height: 1.45; max-width: 96ch; }
+.fin-a11y.a11y-ok { color: #2e6b3f; }
+.fin-a11y.a11y-warn { color: #8a5a12; }
+.fin-a11y.a11y-bad { color: #b3261e; font-weight: 600; }
+body.themed .fin-a11y.a11y-ok, body.themed .fin-a11y.a11y-warn { color: var(--muted); }
+body.themed .fin-a11y.a11y-bad { color: var(--ink); }
 
 /* toolbar */
 

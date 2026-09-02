@@ -14,6 +14,7 @@ import { ARCHETYPES } from "./archetypes/index.js";
 import { fullStylesheet } from "./starter.js";
 import { genomeLink, parseHash, normalizeGenome } from "./share.js";
 import { MOTIF_SLOTS, SLOT_LABELS, freeSlots, allowedMotifs } from "./motifs.js";
+import { auditContrast, hardFailures, summarizeIssues, paletteIssues } from "./a11y.js";
 
 const ROUNDS = 4;
 const GRID_N = 12;
@@ -49,6 +50,7 @@ const els = {
   finPreview: document.getElementById("fin-preview"),
   finName: document.getElementById("fin-name"),
   finBlurb: document.getElementById("fin-blurb"),
+  finA11y: document.getElementById("fin-a11y"),
   prompt: document.getElementById("prompttext"),
   promptMode: document.getElementById("prompt-mode"),
   promptMeta: document.getElementById("prompt-meta"),
@@ -135,19 +137,20 @@ function renderRound({ reuseGrid = false } = {}) {
       "Fine variations on your taste. The one you pick opens the editor, where you can tune the palette and every other knob.";
   }
 
-  let css = "";
   els.grid.innerHTML = "";
   const frag = document.createDocumentFragment();
+  const tileCss = new Map();
 
-  state.grid.forEach((g) => {
+  const buildTile = (g) => {
     const key = genomeKey(g);
     state.seen.add(key);
     state.shownArchs.add(g.archetype);
     const { el, css: gCss } = sampleElement(g, state.specimen);
-    css += gCss;
+    tileCss.set(key, gCss);
 
     const tile = document.createElement("article");
     tile.className = "tile" + (favKey === key ? " tile-fav" : "");
+    tile.dataset.key = key;
 
     const viewport = document.createElement("div");
     viewport.className = "tile-viewport";
@@ -181,13 +184,48 @@ function renderRound({ reuseGrid = false } = {}) {
 
     tile.append(viewport, caption);
     viewport.addEventListener("click", () => onPick(g));
-    frag.appendChild(tile);
-  });
+    return tile;
+  };
 
-  gridStyle.textContent = css;
+  state.grid.forEach((g) => frag.appendChild(buildTile(g)));
+  gridStyle.textContent = [...tileCss.values()].join("");
   els.grid.appendChild(frag);
+
+  // Rendered legibility guard: a tile whose readable text falls to
+  // white-on-white territory is swapped for a fresh candidate before paint.
+  // (The favorite is the user's own pick and is never swapped.)
+  if (!reuseGrid) {
+    const tiles = [...els.grid.querySelectorAll(".tile")];
+    tiles.forEach((tile, index) => {
+      if (tile.dataset.key === favKey) return;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const sample = tile.querySelector(".sample");
+        if (!hardFailures(auditContrast(sample)).length) return;
+        const replacement = replacementGenome();
+        if (!replacement) return;
+        tileCss.delete(tile.dataset.key);
+        state.grid[index] = replacement;
+        const fresh = buildTile(replacement);
+        tile.replaceWith(fresh);
+        tile = fresh;
+        gridStyle.textContent = [...tileCss.values()].join("");
+      }
+    });
+  }
   updateBackButton();
   requestAnimationFrame(scaleAll);
+}
+
+// One more candidate for the current round, honoring the same constraints.
+function replacementGenome() {
+  if (state.round === 1) {
+    const onScreen = new Set(state.grid.map((g) => g.archetype));
+    return diverseSet(state.r, 1, isTaken, state.prefs, onScreen)[0] || null;
+  }
+  const rejected = new Set([...state.shownArchs].filter((a) => !state.likedArchs.has(a)));
+  const fav = state.liked[state.liked.length - 1];
+  const others = state.grid.filter((g) => g !== fav);
+  return neighborSet(state.r, state.liked, 1, state.round, isTaken, state.prefs, rejected, others)[0] || null;
 }
 
 function onPick(g) {
@@ -252,11 +290,22 @@ function refreshFinale() {
   els.finPreview.appendChild(el);
   els.finName.textContent = `${a.name} · ${genomeGenesLabel(g)}`;
   els.finBlurb.textContent = a.blurb;
+  refreshLegibility(el);
   refreshPrompt();
   applyTheme(g);
   // Keep the URL a permalink to exactly what is on screen.
   history.replaceState(null, "", genomeLink(g, state.specimen, location.pathname + location.search));
   requestAnimationFrame(scaleAll);
+}
+
+function refreshLegibility(sampleEl) {
+  const issues = auditContrast(sampleEl);
+  const tokenIssues = paletteIssues(state.finalGenome);
+  const hard = hardFailures(issues);
+  els.finA11y.textContent = issues.length || tokenIssues.length
+    ? `Legibility: ${summarizeIssues(issues)}${tokenIssues.length ? ` Palette: ${tokenIssues.map((i) => `${i.label} ${i.ratio.toFixed(1)}:1`).join(", ")}.` : ""}`
+    : "Legibility: all text in this preview passes WCAG contrast.";
+  els.finA11y.className = `fin-a11y ${hard.length ? "a11y-bad" : issues.length || tokenIssues.length ? "a11y-warn" : "a11y-ok"}`;
 }
 
 function refreshPrompt() {

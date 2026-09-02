@@ -54,13 +54,13 @@ ${s} .kicker {
 ${s} .card { border: 3px double var(--border); border-radius: 42px 8px 36px 8px; }
 ${s} .card:nth-child(2) { border-radius: 8px 40px 8px 34px; }
 ${s} .card:nth-child(3) { border-radius: 38px 8px 44px 8px; }
-${s} .card-t { color: var(--accent2); font-style: italic; }
+${s} .card-t { color: var(--accent2-text); font-style: italic; }
 ${s} .card-t::after { content: " ❧"; color: var(--muted); }
 ${s} .chip { border-color: var(--border); color: var(--ink); }
 ${s} .btn-a { letter-spacing: .04em; }
 ${s} .btn-b { border-color: var(--border); font-style: italic; }
-${s} .stat-num { color: var(--accent2); }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-num { color: var(--accent2-text); }
+${s} .stat-delta { color: var(--accent-text); }
 ${s} .logo { background: ${g.p.gold}; border-radius: 50% 0 50% 0; }
 ${s} .topbar { border-bottom-color: var(--border); }
 ${s} .foot { border-top-color: var(--border); }
@@ -107,7 +107,7 @@ ${s} .hero::after {
 ${s} .smain { z-index: 2; }
 ${s} .display { font-size: 40px; font-weight: 400; line-height: 1.3; }
 ${s} .sub { font-size: 14.5px; }
-${s} .kicker { color: var(--accent); letter-spacing: .26em; font-weight: 400; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .26em; font-weight: 400; }
 ${s} .card {
   background: transparent; border: none; border-bottom: 1px solid var(--border);
   border-radius: 0; padding-left: 0; padding-right: 0;
@@ -168,14 +168,14 @@ ${s} {
     var(--bg);
 }
 ${s} .display { font-size: 40px; }
-${s} .kicker { color: var(--accent2); letter-spacing: .18em; }
+${s} .kicker { color: var(--accent2-text); letter-spacing: .18em; }
 ${s} .card { background: var(--surface); border: 3px double var(--border); padding: calc(var(--sp) * 2.4); }
 ${s} .card-t { text-align: center; }
-${s} .card-t::before { content: "✦ "; color: var(--accent2); }
+${s} .card-t::before { content: "✦ "; color: var(--accent2-text); }
 ${s} .chip { border-color: var(--border); color: var(--ink); border-radius: 0; }
 ${s} .btn-a { color: ${goldText}; letter-spacing: .06em; }
 ${s} .btn-b { border-color: var(--border); }
-${s} .stat-num { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
 ${s} .logo { background: var(--accent); border-radius: 0; clip-path: ${star}; }
 ${s} .topbar { border-bottom-color: var(--border); }
 ${s} .foot { border-top-color: var(--border); }

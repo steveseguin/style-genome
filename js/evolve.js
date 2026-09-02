@@ -18,6 +18,7 @@ import { hexToHsl } from "./color.js";
 import { fontClass } from "./fonts.js";
 import { chartSpec } from "./render.js";
 import { normalizeMotifs, MOTIF_SLOTS } from "./motifs.js";
+import { calibrate, paletteLegible } from "./a11y.js";
 import { pick, chance, shuffle, mulberry32 } from "./rng.js";
 
 const STANDARD_ROLES = new Set(["bg", "surface", "surface2", "ink", "muted", "accent", "accent2", "border", "dark"]);
@@ -110,12 +111,20 @@ const LIGHT_CAPABLE = new Set();
 {
   const capR = mulberry32(0xc0ffee);
   for (const id of ARCHETYPE_IDS) {
+    const rolls = [];
     for (let i = 0; i < 24; i++) {
       const g = randomGenome(capR, id);
       (g.p.dark ? DARK_CAPABLE : LIGHT_CAPABLE).add(id);
+      rolls.push(g);
     }
+    calibrate(id, rolls);
   }
 }
+
+// Can this archetype wear a palette of this mode? Craft CSS often hardcodes
+// surfaces for the mode conform() produces (a paper archetype with white
+// cards), so a foreign palette of the other mode breaks legibility.
+export const canWear = (id, dark) => (dark ? DARK_CAPABLE : LIGHT_CAPABLE).has(id);
 
 function modeIds(prefs) {
   if (prefs?.mode === "dark") return ARCHETYPE_IDS.filter((id) => DARK_CAPABLE.has(id));
@@ -161,7 +170,7 @@ const paletteKey = (g) => `${g.p.bg}|${g.p.accent}`;
 
 // ------------------------------------------------- round 1: maximum spread
 
-export function diverseSet(r, n, isTaken, prefs) {
+export function diverseSet(r, n, isTaken, prefs, excludeArchs = new Set()) {
   // Build a large candidate pool. The first pass gives each available family
   // one fair slot and chooses the archetype inside that family uniformly;
   // maximin scoring then picks its strongest roll. This keeps a growing family
@@ -192,8 +201,10 @@ export function diverseSet(r, n, isTaken, prefs) {
 
   const accept = (c, maxPerArch, relaxed = false) => {
     if (isTaken(genomeKey(c))) return false;
+    if (excludeArchs.has(c.archetype)) return false;
     if ((archCount.get(c.archetype) || 0) >= maxPerArch) return false;
     if (labels.has(labelKey(c))) return false;
+    if (!paletteLegible(c)) return false;
     if (relaxed) return true;
     if (patterned >= MAX_PATTERNED && isPatterned(c)) return false;
     if (cream >= MAX_CREAM && isCreamPage(c)) return false;
@@ -266,9 +277,10 @@ function mutate(r, base, rate) {
   for (const gene of GENE_KEYS) {
     if (!chance(r, rate)) continue;
     if (gene === "p") {
-      g.p = chance(r, 0.7)
-        ? cloneGenome(conformed.p)
-        : { ...cloneGenome(fresh.p), ...decorRoles(g.p) };
+      // Always the archetype's own palette logic: craft CSS may hardcode
+      // surfaces for the mode conform() produces, so a raw palette can leave
+      // text unreadable.
+      g.p = cloneGenome(conformed.p);
     } else if (gene === "fonts") {
       g.fonts = cloneGenome(chance(r, 0.7) ? conformed.fonts : fresh.fonts);
     } else if (gene === "chart") {
@@ -299,7 +311,7 @@ function cousin(r, base, rejectedArchs, prefs, likedArchs, carryP) {
   const pool = fresh.length ? fresh : exploring.length ? exploring : rel;
   const g = randomGenome(r, pick(r, pool));
   const carried = cloneGenome(base);
-  if (chance(r, carryP)) {
+  if (chance(r, carryP) && canWear(g.archetype, !!carried.p.dark)) {
     // Carry the complete standard palette promised by the picker while
     // preserving target-archetype custom decor roles such as gold/paper3.
     g.p = { ...cloneGenome(carried.p), ...decorRoles(g.p) };
@@ -315,7 +327,7 @@ function crossover(r, a, b) {
   for (const gene of GENE_KEYS) {
     if (!chance(r, 0.5)) continue;
     if (gene === "p") {
-      g.p = { ...cloneGenome(other.p), ...decorRoles(g.p) };
+      if (canWear(g.archetype, !!other.p.dark)) g.p = { ...cloneGenome(other.p), ...decorRoles(g.p) };
     } else if (gene === "chart" || gene === "chartTreatment" || gene === "chartGrid") {
       carryChartGenes(g, other);
     } else if (gene === "motifs") {
@@ -331,7 +343,9 @@ function crossover(r, a, b) {
 }
 
 // round: 2, 3, 4… — later rounds mutate less, wander less, and inherit more.
-export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = new Set()) {
+// `existing` seeds the uniqueness bookkeeping with tiles already on screen
+// (used when a single tile is regenerated) without returning them.
+export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = new Set(), existing = []) {
   const cfg = {
     2: { rate: 0.55, cousinP: 0.4, wildP: 0.15, carryP: 0.35, samePal: 2 },
     3: { rate: 0.4, cousinP: 0.3, wildP: 0.06, carryP: 0.6, samePal: 4 },
@@ -349,6 +363,13 @@ export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = 
   const favPal = paletteKey(fav);
   let samePal = 0;
   let patterned = 0;
+  for (const g of existing) {
+    batchKeys.add(genomeKey(g));
+    labels.add(labelKey(g));
+    archCount.set(g.archetype, (archCount.get(g.archetype) || 0) + 1);
+    if (paletteKey(g) === favPal) samePal++;
+    if (isPatterned(g)) patterned++;
+  }
   // If the user has not shown interest in a print process, keep patterned
   // charts rare; if they picked one, let the print family come through.
   const maxPatterned = liked.some(isPatterned) ? n : 2;
@@ -363,6 +384,7 @@ export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = 
     const key = genomeKey(g);
     if (isTaken(key) || batchKeys.has(key)) return false;
     if (!matchesPrefs(g, prefs)) return false;
+    if (!paletteLegible(g)) return false;
     if (dist(g, fav) < 0.55) return false;
     if (labels.has(labelKey(g))) return false;
     if (strict) {

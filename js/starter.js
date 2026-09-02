@@ -6,7 +6,7 @@
 
 import { fontStack } from "./fonts.js";
 import { onColor } from "./color.js";
-import { shadowValues, textureCss } from "./render.js";
+import { shadowValues, textureCss, accentTextColors } from "./render.js";
 import { motifsCss } from "./motifs.js";
 
 const SPACING = { airy: 11, normal: 9, dense: 7 };
@@ -26,6 +26,7 @@ const pad = (s, n) => (s.length >= n ? s + " " : s + " ".repeat(n - s.length));
 export function tokensRootCss(g, selector = ":root") {
   const p = g.p;
   const sh = shadowValues(g);
+  const { accentText, accent2Text } = accentTextColors(p);
   const caseVal = g.case === "upper" ? "uppercase" : g.case === "lower" ? "lowercase" : "none";
   const rows = [
     ["/* Palette */"],
@@ -38,6 +39,8 @@ export function tokensRootCss(g, selector = ":root") {
     ["--accent2", p.accent2, "second data series, status dots, alternate tags"],
     ["--border", p.border, "every border, rule, and divider"],
     ["--on-accent", onColor(p.accent), "text placed on top of --accent"],
+    ["--accent-text", accentText, "the accent when used AS TEXT (labels, links, deltas): contrast-safe on page and cards"],
+    ["--accent2-text", accent2Text, "the second accent when used AS TEXT (status, helper text)"],
     ...customPaletteRoles(g).map(([key, value]) => [`--${key}`, value, `archetype decor color "${key}" (used by the craft CSS)`]),
     ["/* Typography */"],
     ["--f-display", fontStack(g.fonts.display), "headings, brand, big numbers"],
@@ -79,13 +82,13 @@ ${s} h2 { font-size: clamp(24px, 3.2vw, 34px); }
 ${s} h3, ${s} .card-t { font-size: 17px; }
 ${s} p { margin: 0 0 1em; }
 ${s} .sub { color: var(--muted); font-size: 1.05em; max-width: 54ch; }
-${s} .kicker { font-size: 11.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+${s} .kicker { font-size: 11.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); }
 ${s} .stat-label, ${s} .meta { font-size: 10.5px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
-${s} a { color: var(--accent); text-underline-offset: 2px; }
+${s} a { color: var(--accent-text); text-underline-offset: 2px; }
 ${s} .muted, ${s} small, ${s} .card-p { color: var(--muted); }
 ${s} code, ${s} pre, ${s} kbd, ${s} .list-no { font-family: var(--f-mono); }
 ${s} .stat-num { font-size: 33px; }
-${s} .stat-delta { font-size: 12px; color: var(--accent); font-weight: 600; }
+${s} .stat-delta { font-size: 12px; color: var(--accent-text); font-weight: 600; }
 
 /* Header & footer */
 ${s} .topbar { display: flex; align-items: center; gap: calc(var(--sp) * 2.2); padding: calc(var(--sp) * 1.5) calc(var(--sp) * 3); border-bottom: var(--bw) solid var(--border); }
@@ -120,8 +123,8 @@ ${s} .chip { display: inline-block; font-size: 11px; padding: 3px 10px; border: 
 ${s} .chip.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 ${s} .status { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 12px; }
 ${s} .status i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent2); }
-${s} .status.ok { color: var(--accent2); }
-${s} .status.warn { color: var(--accent); }
+${s} .status.ok { color: var(--accent2-text); }
+${s} .status.warn { color: var(--accent-text); }
 ${s} .tabs { display: flex; gap: 3px; border-bottom: 1px solid var(--border); }
 ${s} .tab { padding: 6px 9px; color: var(--muted); border-bottom: 2px solid transparent; }
 ${s} .tab.on { color: var(--ink); border-color: var(--accent); font-weight: 700; }
@@ -136,7 +139,7 @@ ${s} input, ${s} select, ${s} textarea { font: inherit; color: var(--ink); backg
 ${s} ::placeholder { color: var(--muted); }
 ${s} .form-field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
 ${s} .field-error input, ${s} input[aria-invalid="true"] { border-color: var(--accent); }
-${s} .error-text { color: var(--accent); }
+${s} .error-text { color: var(--accent-text); }
 ${s} .field { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 7px 12px; background: var(--surface); border: var(--bw) solid var(--border); border-radius: var(--r-ctl); color: var(--muted); }
 
 /* Tables, code, rules */

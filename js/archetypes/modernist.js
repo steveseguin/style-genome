@@ -120,7 +120,7 @@ ${s} .btn-b { border-width: 2px; border-color: var(--ink); }
     css(s, g) {
       return `
 ${s} .display { font-size: 50px; line-height: 1.12; }
-${s} .kicker { letter-spacing: .3em; font-size: 10px; color: var(--accent); font-weight: 500; }
+${s} .kicker { letter-spacing: .3em; font-size: 10px; color: var(--accent-text); font-weight: 500; }
 ${s} .stat-label, ${s} .chip { letter-spacing: .22em; font-size: 9.5px; }
 ${s} .card { background: transparent; border: none; border-top: 1px solid var(--border); border-radius: 0; padding-left: 0; padding-right: 0; }
 ${s} .btn { padding: 10px 26px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; font-size: 10.5px; }

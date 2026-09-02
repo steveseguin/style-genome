@@ -45,11 +45,11 @@ ${s} .brand { color: #000; }
 ${s} .logo { background: #000; border-radius: 999px; width: 24px; height: 10px; }
 ${s} .topnav .nl { color: #000; opacity: .62; }
 ${s} .topnav .nl.on { color: #000; opacity: 1; }
-${s} .topbar .btn-b { background: #000; color: var(--accent); border: none; }
+${s} .topbar .btn-b { background: #000; color: var(--accent-text); border: none; }
 ${s} .hero { padding-left: 62px; position: relative; }
 ${s} .hero::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 44px; background: var(--accent2); border-radius: 22px 0 0 22px; }
-${s} .hero::after { content: "LCARS 47-2291"; position: absolute; left: 0; top: -19px; font: 9px var(--f-mono); color: var(--accent2); letter-spacing: .14em; }
-${s} .kicker { color: var(--accent2); font-family: var(--f-mono); letter-spacing: .16em; }
+${s} .hero::after { content: "LCARS 47-2291"; position: absolute; left: 0; top: -19px; font: 9px var(--f-mono); color: var(--accent2-text); letter-spacing: .14em; }
+${s} .kicker { color: var(--accent2-text); font-family: var(--f-mono); letter-spacing: .16em; }
 ${s} .display { font-size: 46px; color: var(--ink); }
 ${s} .card { background: var(--surface2); border: none; box-shadow: none; }
 ${s} .card-t, ${s} .stat-label { background: var(--accent); color: #000; padding: 5px 14px; border-radius: 999px; font-size: 11px; letter-spacing: .1em; align-self: flex-start; text-transform: uppercase; font-weight: 700; }
@@ -59,8 +59,8 @@ ${s} .btn { border: none; text-transform: uppercase; letter-spacing: .1em; font-
 ${s} .btn-a { background: var(--accent); color: #000; box-shadow: none; }
 ${s} .btn-b { background: var(--accent2); color: #000; }
 ${s} .foot { border-top: none; background: var(--accent2); color: #000; border-radius: 0 30px 0 0; }
-${s} .stat-num { color: var(--accent); font-family: var(--f-mono); }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-num { color: var(--accent-text); font-family: var(--f-mono); }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .chart rect { fill: var(--accent); }
 ${s} .chart rect:nth-child(even) { fill: var(--accent2); }
 ${s} .tab.on, ${s} .stepper .on { border-color: var(--accent); }
@@ -110,7 +110,7 @@ ${s} {
 ${s} .cards { counter-reset: pcb; }
 ${s} .card { position: relative; border-color: var(--border); counter-increment: pcb; }
 ${s} .card::after { content: "U" counter(pcb); position: absolute; top: 6px; right: 8px; font: 9px var(--f-mono); color: var(--muted); letter-spacing: .08em; pointer-events: none; }
-${s} .kicker { font-family: var(--f-mono); color: var(--accent2); letter-spacing: .12em; }
+${s} .kicker { font-family: var(--f-mono); color: var(--accent2-text); letter-spacing: .12em; }
 ${s} .kicker::before { content: "J1 · "; }
 ${s} .display { font-size: 40px; color: #ffffff; }
 ${s} .logo { border-radius: 50%; background: var(--accent2); box-shadow: inset 0 0 0 3px var(--bg), inset 0 0 0 5px var(--accent2); width: 16px; height: 16px; }
@@ -118,8 +118,8 @@ ${s} .btn { border-radius: 2px; text-transform: uppercase; letter-spacing: .08em
 ${s} .btn-a { background: var(--accent); color: #1a1408; box-shadow: none; }
 ${s} .btn-b { border-color: var(--border); color: var(--ink); }
 ${s} .chip { border: 1px solid var(--border); border-radius: 1px; font-family: var(--f-mono); text-transform: uppercase; font-size: 9.5px; color: var(--ink); background: ${alpha(cu, 0.14)}; }
-${s} .stat-num { color: var(--accent); font-family: var(--f-mono); }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-num { color: var(--accent-text); font-family: var(--f-mono); }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .topbar, ${s} .foot { border-color: var(--border); }
 ${s} .foot { font-family: var(--f-mono); font-size: 10px; letter-spacing: .06em; }
 ${s} .chart polyline { stroke: var(--accent); }
@@ -234,7 +234,7 @@ ${s} .hero::before {
 }
 ${s} .hero::after { content: ""; position: absolute; right: 96px; top: 30px; width: 72px; height: 72px; border-radius: 50%; background: var(--accent); opacity: .16; z-index: 0; }
 ${s} .hero > * { position: relative; z-index: 1; }
-${s} .kicker { color: var(--accent); font-variant: small-caps; text-transform: none; letter-spacing: .3em; font-size: 12px; font-weight: 500; }
+${s} .kicker { color: var(--accent-text); font-variant: small-caps; text-transform: none; letter-spacing: .3em; font-size: 12px; font-weight: 500; }
 ${s} .kicker::before { content: "✦ "; }
 ${s} .kicker::after { content: " ✦"; }
 ${s} .display { font-size: 36px; letter-spacing: .1em; line-height: 1.12; max-width: 18ch; }
@@ -242,12 +242,12 @@ ${s} .card { border-color: var(--border); position: relative; }
 ${s} .card::before, ${s} .card::after { content: ""; position: absolute; width: 10px; height: 10px; border: 2px solid var(--border); pointer-events: none; }
 ${s} .card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
 ${s} .card::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
-${s} .chip { border-color: var(--border); color: var(--accent); font-variant: small-caps; text-transform: none; letter-spacing: .14em; border-radius: 0; font-size: 11px; }
+${s} .chip { border-color: var(--border); color: var(--accent-text); font-variant: small-caps; text-transform: none; letter-spacing: .14em; border-radius: 0; font-size: 11px; }
 ${s} .btn { border-radius: 0; letter-spacing: .14em; text-transform: uppercase; font-size: 11px; }
 ${s} .btn-a { background: var(--accent); color: #17122b; box-shadow: none; }
 ${s} .btn-b { border-color: var(--border); color: var(--ink); }
-${s} .stat-num { color: var(--accent); font-weight: 400; }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-num { color: var(--accent-text); font-weight: 400; }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .logo { border-radius: 50%; background: transparent; border: 1px solid var(--accent); box-shadow: inset 0 0 0 3px var(--bg), inset 0 0 0 8px var(--accent); width: 16px; height: 16px; }
 ${s} .topbar, ${s} .foot { border-color: var(--border); }
 ${s} .foot { letter-spacing: .12em; text-transform: uppercase; font-size: 10px; }
@@ -293,7 +293,7 @@ ${s} {
 }
 ${s} .topbar, ${s} .foot { background: var(--surface); }
 ${s} .card { outline: 1px solid var(--border); outline-offset: -5px; }
-${s} .kicker { font-style: italic; text-transform: none; letter-spacing: 0; font-size: 14px; font-weight: 400; color: var(--accent); }
+${s} .kicker { font-style: italic; text-transform: none; letter-spacing: 0; font-size: 14px; font-weight: 400; color: var(--accent-text); }
 ${s} .kicker::before { content: "❀ "; font-style: normal; }
 ${s} .display { font-size: 44px; }
 ${s} .sub { color: var(--ink); opacity: .82; }
@@ -301,7 +301,7 @@ ${s} .chip { background: ${alpha(a, 0.13)}; border-color: transparent; color: va
 ${s} .btn-a { color: #ffffff; }
 ${s} .btn-b { background: var(--surface); }
 ${s} .logo { border-radius: 50%; background: var(--accent2); }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .card-t { font-weight: 600; }
 ${s} .hero .field, ${s} .hero .stepper { background: var(--surface); }
 `;
@@ -349,12 +349,12 @@ ${s} .hero { position: relative; }
 ${s} .hero::after {
   content: "N"; position: absolute; right: 34px; top: -12px; width: 96px; height: 96px; border-radius: 50%; z-index: 0;
   border: 1px solid ${alpha(ink, 0.8)}; outline: 1px solid ${alpha(ink, 0.6)}; outline-offset: -8px;
-  display: grid; place-items: start center; padding-top: 10px; font: 600 11px var(--f-display); color: var(--accent);
+  display: grid; place-items: start center; padding-top: 10px; font: 600 11px var(--f-display); color: var(--accent-text);
   background: linear-gradient(${alpha(ink, 0.6)}, ${alpha(ink, 0.6)}) center / 1px 100% no-repeat, linear-gradient(${alpha(ink, 0.6)}, ${alpha(ink, 0.6)}) center / 100% 1px no-repeat;
 }
 ${s} .hero > * { position: relative; z-index: 1; }
 ${s} .kicker { font-family: var(--f-mono); color: var(--muted); text-transform: none; letter-spacing: .06em; font-weight: 400; font-size: 11.5px; }
-${s} .kicker::before { content: "47°36′N 122°20′W  · · · · · ·  "; color: var(--accent); }
+${s} .kicker::before { content: "47°36′N 122°20′W  · · · · · ·  "; color: var(--accent-text); }
 ${s} .display { font-variant: small-caps; letter-spacing: .04em; font-size: 46px; }
 ${s} .card { border: 1px solid var(--border); outline: 1px solid var(--border); outline-offset: -5px; background: var(--surface); }
 ${s} .card-t { font-variant: small-caps; letter-spacing: .06em; font-size: 16px; }
@@ -363,8 +363,8 @@ ${s} .btn { border-radius: 0; font-variant: small-caps; letter-spacing: .08em; }
 ${s} .btn-a { background: var(--ink); color: var(--bg); box-shadow: none; }
 ${s} .btn-b { border-color: var(--ink); }
 ${s} .logo { border-radius: 50%; background: var(--accent); box-shadow: inset 0 0 0 2px var(--bg), inset 0 0 0 3px var(--ink); width: 15px; height: 15px; }
-${s} .stat-num { color: var(--accent); font-weight: 500; }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-num { color: var(--accent-text); font-weight: 500; }
+${s} .stat-delta { color: var(--accent2-text); }
 ${s} .topbar, ${s} .foot { border-color: var(--ink); }
 ${s} .foot { font-variant: small-caps; letter-spacing: .1em; }
 ${s} .spark polyline { stroke: var(--accent); stroke-dasharray: 3 3; }
@@ -414,7 +414,7 @@ ${s} .logo::after { content: "8"; position: absolute; inset: 0; display: grid; p
 ${s} .btn { border: 3px solid var(--ink); font-family: var(--f-display); font-weight: 900; text-transform: uppercase; letter-spacing: .06em; box-shadow: 3px 3px 0 var(--ink); }
 ${s} .btn-a { color: ${on}; }
 ${s} .btn-b { background: var(--surface); }
-${s} .stat-num { color: var(--accent); text-shadow: 1.5px 1.5px 0 var(--ink); }
+${s} .stat-num { color: var(--accent-text); text-shadow: 1.5px 1.5px 0 var(--ink); }
 ${s} .stat-delta { color: var(--ink); }
 ${s} .topbar, ${s} .foot { border-color: var(--ink); border-width: 3px; }
 ${s} .card-t { letter-spacing: .04em; }

@@ -106,12 +106,12 @@ ${s} .card { box-shadow: ${out}; border: none; }
 ${s} .topbar { border-bottom: none; box-shadow: 0 6px 10px -6px ${alpha(dark, 0.5)}; }
 ${s} .foot { border-top: none; box-shadow: 0 -6px 10px -6px ${alpha(dark, 0.4)}; }
 ${s} .btn { border: none; }
-${s} .btn-a { background: var(--bg); color: var(--accent); box-shadow: ${out}; font-weight: 700; }
+${s} .btn-a { background: var(--bg); color: var(--accent-text); box-shadow: ${out}; font-weight: 700; }
 ${s} .btn-b { background: var(--bg); color: var(--muted); box-shadow: ${inset}; }
 ${s} .chip { border: none; box-shadow: ${inset}; }
 ${s} .logo { border-radius: 50%; background: var(--accent); box-shadow: 2px 2px 5px ${alpha(dark, 0.6)}; }
 ${s} .display { font-size: 42px; color: var(--ink); }
-${s} .kicker { color: var(--accent); }
+${s} .kicker { color: var(--accent-text); }
 `;
     },
   },
@@ -156,7 +156,7 @@ ${s} .display { font-size: 44px; }
 ${s} .topbar { border-bottom: none; }
 ${s} .foot { border-top: none; }
 ${s} .logo { border-radius: 50%; width: 16px; height: 16px; box-shadow: 0 4px 8px ${alpha(g.p.accent, 0.5)}; }
-${s} .stat-num { color: var(--accent); }
+${s} .stat-num { color: var(--accent-text); }
 `;
     },
   },
@@ -255,7 +255,7 @@ ${s} .display {
 ${s} .btn-a { background: ${grad}; box-shadow: 0 8px 20px ${alpha(g.p.accent, 0.4)}; }
 ${s} .card { box-shadow: 0 12px 30px ${alpha(g.p.accent, 0.12)}; }
 ${s} .logo { border-radius: 50%; background: ${grad}; }
-${s} .stat-delta { color: var(--accent2); }
+${s} .stat-delta { color: var(--accent2-text); }
 `;
     },
   },
@@ -294,11 +294,11 @@ ${s} .stat-delta { color: var(--accent2); }
 ${s} .display { font-size: 42px; letter-spacing: -0.01em; }
 ${s} .card-t { padding-bottom: 8px; position: relative; }
 ${s} .card-t::after { content: ""; position: absolute; left: 0; bottom: 0; width: 24px; height: 1px; background: var(--border); }
-${s} .kicker { color: var(--accent); letter-spacing: .16em; font-weight: 500; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .16em; font-weight: 500; }
 ${s} .chip { color: var(--muted); }
 ${s} .btn-a { background: var(--ink); color: var(--bg); box-shadow: none; }
 ${s} .logo { border-radius: 3px; background: var(--accent); }
-${s} .stat-delta { color: var(--accent); }
+${s} .stat-delta { color: var(--accent-text); }
 `;
     },
   },

@@ -208,9 +208,9 @@ ${s} .display {
 }
 ${s} .card { background: ${alpha("#160f33", 0.55)}; backdrop-filter: blur(2px); }
 ${s}.export-mode .card { background: ${alpha("#160f33", 0.85)}; }
-${s} .kicker { color: var(--accent2); }
+${s} .kicker { color: var(--accent2-text); }
 ${s} .btn-a { box-shadow: 0 0 18px ${alpha(g.p.accent, 0.55)}; }
-${s} .stat-num { color: var(--accent2); text-shadow: 0 0 12px ${alpha(g.p.accent2, 0.6)}; }
+${s} .stat-num { color: var(--accent2-text); text-shadow: 0 0 12px ${alpha(g.p.accent2, 0.6)}; }
 ${s} .logo { background: linear-gradient(135deg, ${g.p.accent}, ${g.p.accent2}); border-radius: 50%; }
 ${s} .topbar { border-bottom-color: ${alpha("#ffffff", 0.25)}; }
 ${s} .foot { border-top-color: ${alpha("#ffffff", 0.25)}; }
@@ -262,7 +262,7 @@ ${s} .btn-a {
 ${s} .btn { position: relative; overflow: hidden; }
 ${s} .btn::after { content: ""; position: absolute; inset: 1px 1px 48% 1px; background: ${gloss}; border-radius: inherit; opacity: .8; }
 ${s} .display { color: #10405e; font-size: 43px; }
-${s} .kicker { color: var(--accent2); }
+${s} .kicker { color: var(--accent2-text); }
 ${s} .chip { background: rgba(255,255,255,.8); }
 ${s} .logo { border-radius: 50%; background: radial-gradient(circle at 30% 25%, #fff 0 15%, ${g.p.accent2} 65%); }
 ${s} .topbar { border-bottom-color: rgba(255,255,255,.8); }
@@ -313,7 +313,7 @@ ${s} .display { font-size: 46px; }
 ${s} .card { border-color: var(--ink); }
 ${s} .chip { background: ${mix(g.p.accent2, "#ffffff", 0.55)}; border-color: transparent; color: var(--ink); font-weight: 700; }
 ${s} .btn-b { border-color: var(--ink); border-width: 2px; }
-${s} .kicker { color: var(--accent); letter-spacing: .2em; }
+${s} .kicker { color: var(--accent-text); letter-spacing: .2em; }
 ${s} .topbar { border-bottom-color: var(--ink); }
 ${s} .foot { border-top-color: var(--ink); }
 ${s} .logo { border-radius: 50%; background: radial-gradient(circle, ${g.p.accent} 0 40%, ${g.p.accent2} 40% 75%, ${g.p.ink} 75%); }
