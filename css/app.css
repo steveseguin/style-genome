@@ -93,12 +93,20 @@ body {
 .intro { margin: 6px 0 22px; }
 .intro h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.01em; }
 .intro p { margin: 0; color: var(--app-muted); max-width: 68ch; }
+.intro h1:focus { outline: none; }
+.round-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; margin-top: 20px; }
+.round-progress { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0; counter-reset: round; }
+.round-progress li { counter-increment: round; font-size: 12px; color: var(--app-muted); padding: 5px 9px; border-radius: 6px; }
+.round-progress li::before { content: counter(round) " "; font-variant-numeric: tabular-nums; }
+.round-progress li[aria-current] { background: var(--app-ink); color: #fff; }
+.round-progress li.complete { color: var(--app-ink); background: #e4e4df; }
+.round-detail { font-size: 12px; color: var(--app-muted); }
 
 /* ------------------------------------------------- tile grid */
 
 .tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(315px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 315px), 1fr));
   gap: 18px;
 }
 
@@ -135,24 +143,25 @@ body {
 .gal-note #combos { color: var(--app-ink); }
 
 .tile-caption {
-  display: flex; align-items: baseline; gap: 10px;
+  display: flex; align-items: center; gap: 10px;
   padding: 9px 13px 10px;
   border-top: 1px solid var(--app-border);
 }
 .tile-choose {
-  min-width: 0; flex: 1; display: flex; align-items: baseline; gap: 10px;
+  min-width: 0; flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
   padding: 0; border: 0; background: transparent; color: inherit;
   font: inherit; text-align: left; cursor: pointer;
 }
 .tile-choose:focus-visible { outline: 2px solid #3e63dd; outline-offset: 4px; border-radius: 2px; }
 .tile-name { font-size: 13px; font-weight: 650; }
-.tile-genes { font-size: 11.5px; color: var(--app-muted); margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile-genes { font-size: 11.5px; color: var(--app-muted); max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile-relation { font-size: 10px; color: var(--app-muted); }
+.tile-fav .tile-relation { color: #725817; font-weight: 650; }
+.tile-fav { border-color: #8a6d1d; }
 
-.tile-fav .tile-name::after {
-  content: "★ current favorite";
-  font-size: 10.5px; font-weight: 600;
-  margin-left: 8px;
-  color: #8a6d1d;
+@media (prefers-reduced-motion: reduce) {
+  .tile { transition: none; }
+  .tile:hover { transform: none; }
 }
 
 .tile-usebtn {

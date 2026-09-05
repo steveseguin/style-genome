@@ -8,7 +8,7 @@ import { buildSample, chartSpec } from "../js/render.js";
 import { buildPrompt } from "../js/prompt.js";
 import { SPECIMENS, SPECIMEN_IDS } from "../js/specimens.js";
 import { mulberry32 } from "../js/rng.js";
-import { diverseSet, neighborSet, canWear } from "../js/evolve.js";
+import { diverseSet, neighborSet, canWear, matchesPrefs, dist } from "../js/evolve.js";
 import { paletteLegible, paletteIssues } from "../js/a11y.js";
 import { fullStylesheet, tokensRootCss, starterCss } from "../js/starter.js";
 import { encodeGenome, decodeGenome, genomeLink, parseHash, normalizeGenome } from "../js/share.js";
@@ -156,6 +156,8 @@ const familyCount = new Set(ARCHETYPE_LIST.map((archetype) => archetype.family))
 for (let seed = 0; seed < 256; seed++) {
   const grid = diverseSet(mulberry32(0x51a70000 + seed), 12, () => false, null);
   assert.equal(grid.length, 12, `discovery seed ${seed}: incomplete opening grid`);
+  const darkCount = grid.filter(g => g.p.dark).length;
+  assert.ok(darkCount >= 5 && darkCount <= 7, `discovery seed ${seed}: unbalanced mode mix (${darkCount} dark)`);
   assert.equal(new Set(grid.map((genome) => genome.archetype)).size, 12, `discovery seed ${seed}: repeated archetype`);
   assert.equal(
     new Set(grid.map((genome) => ARCHETYPE_LIST.find((item) => item.id === genome.archetype).family)).size,
@@ -209,5 +211,50 @@ for (let seed = 0; seed < 32; seed++) {
 }
 assert.ok(siblingKeys.size >= 12, `fixed-style variation regressed: only ${siblingKeys.size} unique Broadsheet siblings`);
 assert.ok(!siblingKeys.has(genomeKey(fixedBase)), "fixed-style mutation repeated the canonical Broadsheet genome");
+
+// Reaffirming a favorite must not create duplicate crossover parents.
+const otherBase = randomGenome(mulberry32(81), "cosmic");
+const repeat = neighborSet(mulberry32(82), [fixedBase, otherBase, fixedBase], 11, 3, () => false);
+const unique = neighborSet(mulberry32(82), [otherBase, fixedBase], 11, 3, () => false);
+assert.deepEqual(repeat, unique, "repeated favorite changed the genetic parent pool");
+
+// Every filter combination survives a complete session and a same-round
+// refresh without sacrificing novelty or leaving holes in the grid.
+for (const mode of ["any", "light", "dark"]) {
+  for (const energy of ["any", "calm", "bold"]) {
+    const prefs = { mode, energy };
+    const r = mulberry32(0xf117);
+    const seen = new Set();
+    const liked = [];
+    let grid = diverseSet(r, 12, k => seen.has(k), prefs);
+    for (let round = 1; round <= 4; round++) {
+      assert.equal(grid.length, 12, `${mode}/${energy}/${round}: incomplete grid`);
+      for (const g of grid) {
+        assert.ok(matchesPrefs(g, prefs), `${mode}/${energy}/${round}: filter escaped`);
+        seen.add(genomeKey(g));
+      }
+      liked.push(grid[0]);
+      const fresh = neighborSet(r, liked, 11, Math.max(2, round), k => seen.has(k), prefs);
+      assert.equal(fresh.length, 11, `${mode}/${energy}: incomplete refresh`);
+      assert.equal(new Set(fresh.map(genomeKey)).size, 11, "refresh contains duplicates");
+      for (const g of fresh) {
+        assert.ok(!seen.has(genomeKey(g)) && matchesPrefs(g, prefs), "refresh lost novelty or filters");
+        seen.add(genomeKey(g));
+      }
+      if (round < 4) grid = [grid[0], ...neighborSet(r, liked, 11, round + 1, k => seen.has(k), prefs)];
+    }
+  }
+}
+
+// Later rounds should converge measurably rather than merely changing copy.
+const distances = { 2: 0, 4: 0 };
+for (let seed = 0; seed < 20; seed++) {
+  const favorite = diverseSet(mulberry32(seed), 12, () => false)[seed % 12];
+  for (const round of [2, 4]) {
+    const neighbors = neighborSet(mulberry32(seed + 100), [favorite], 11, round, () => false);
+    distances[round] += neighbors.reduce((sum, g) => sum + dist(g, favorite), 0) / neighbors.length;
+  }
+}
+assert.ok(distances[4] < distances[2] * 0.85, "final rounds no longer converge toward the favorite");
 
 console.log(`Validated ${ids.size} archetypes, ${MOTIFS.length} motifs (${MOTIF_COMBOS.toLocaleString()} combinations), ${keys.size} genomes, ${prompts} prompts, ${renders} specimen renders, stylesheet + permalink round-trips, legible palettes across 60 simulated sessions, complete discovery exposure, and live sibling variation.`);

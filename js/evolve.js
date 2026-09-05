@@ -196,7 +196,8 @@ export function diverseSet(r, n, isTaken, prefs, excludeArchs = new Set()) {
   const MAX_PATTERNED = 3;
   const MAX_CREAM = prefs?.mode === "light" ? 5 : 3;
   const MAX_TEXTURED = 3;
-  const MIN_DARK = prefs?.mode === "light" ? 0 : 5;
+  const MIN_DARK = prefs?.mode === "light" ? 0 : Math.floor(n * 5 / 12);
+  const MIN_LIGHT = prefs?.mode === "dark" ? 0 : Math.floor(n * 5 / 12);
   let dark = 0;
 
   const accept = (c, maxPerArch, relaxed = false) => {
@@ -221,10 +222,27 @@ export function diverseSet(r, n, isTaken, prefs, excludeArchs = new Set()) {
     if (c.p.dark) dark++;
   };
 
-  const families = shuffle(r, [...new Set(pool.map((g) => ARCHETYPES[g.archetype].family))]);
-  for (const family of families) {
+  const familyPools = new Map();
+  for (const g of pool) {
+    const family = ARCHETYPES[g.archetype].family;
+    if (!familyPools.has(family)) familyPools.set(family, []);
+    familyPools.get(family).push(g);
+  }
+  // Place single-mode families first, leaving flexible families to balance
+  // the grid. Reserve enough of those remaining slots for each mode.
+  const families = shuffle(r, [...familyPools.keys()]).sort((a, b) =>
+    new Set(familyPools.get(a).map(g => g.p.dark)).size - new Set(familyPools.get(b).map(g => g.p.dark)).size);
+  for (const [index, family] of families.entries()) {
     if (chosen.length >= n) break;
-    const familyPool = pool.filter((g) => ARCHETYPES[g.archetype].family === family && accept(g, 1));
+    let familyPool = familyPools.get(family).filter((g) => accept(g, 1));
+    const remaining = families.slice(index + 1);
+    const available = (mode) => remaining.filter(f => familyPools.get(f).some(g => !!g.p.dark === mode && accept(g, 1))).length;
+    const needDark = MIN_DARK - dark;
+    const needLight = MIN_LIGHT - (chosen.length - dark);
+    const targetMode = needDark > available(true) ? true : needLight > available(false) ? false : null;
+    if (targetMode !== null && familyPool.some(g => !!g.p.dark === targetMode)) {
+      familyPool = familyPool.filter(g => !!g.p.dark === targetMode);
+    }
     const archetypeIds = [...new Set(familyPool.map((g) => g.archetype))];
     if (!archetypeIds.length) continue;
     const targetId = pick(r, archetypeIds);
@@ -261,7 +279,9 @@ export function diverseSet(r, n, isTaken, prefs, excludeArchs = new Set()) {
     }
     if (chosen.length >= n) break;
   }
-  return chosen;
+  // Constraint-solving order must not become a positional preference for
+  // paper/light-only families in the first row.
+  return shuffle(r, chosen);
 }
 
 // ------------------------------------------- later rounds: guided neighbors
@@ -322,14 +342,17 @@ function cousin(r, base, rejectedArchs, prefs, likedArchs, carryP) {
 }
 
 function crossover(r, a, b) {
-  const g = cloneGenome(chance(r, 0.5) ? a : b);
-  const other = g.archetype === a.archetype ? b : a;
+  const parent = chance(r, 0.5) ? a : b;
+  const g = cloneGenome(parent);
+  const other = parent === a ? b : a;
   for (const gene of GENE_KEYS) {
     if (!chance(r, 0.5)) continue;
     if (gene === "p") {
       if (canWear(g.archetype, !!other.p.dark)) g.p = { ...cloneGenome(other.p), ...decorRoles(g.p) };
-    } else if (gene === "chart" || gene === "chartTreatment" || gene === "chartGrid") {
+    } else if (gene === "chart") {
       carryChartGenes(g, other);
+    } else if (gene === "chartTreatment" || gene === "chartGrid") {
+      continue;
     } else if (gene === "motifs") {
       const craft = ARCHETYPES[g.archetype].css(".x", g);
       g.motifs = normalizeMotifs(other.motifs, craft, ".x");
@@ -346,11 +369,22 @@ function crossover(r, a, b) {
 // `existing` seeds the uniqueness bookkeeping with tiles already on screen
 // (used when a single tile is regenerated) without returning them.
 export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = new Set(), existing = []) {
+  if (n <= 0) return [];
+  if (!liked.length) return diverseSet(r, n, isTaken, prefs);
+  // Reaffirming a favorite is useful evidence, but not a second genetic
+  // parent. Keep the most recent occurrence and favor recent choices.
+  const uniqueParents = new Map();
+  for (const g of liked) {
+    const key = genomeKey(g);
+    uniqueParents.delete(key);
+    uniqueParents.set(key, g);
+  }
+  liked = [...uniqueParents.values()];
   const cfg = {
-    2: { rate: 0.55, cousinP: 0.4, wildP: 0.15, carryP: 0.35, samePal: 2 },
-    3: { rate: 0.4, cousinP: 0.3, wildP: 0.06, carryP: 0.6, samePal: 4 },
-    4: { rate: 0.25, cousinP: 0.2, wildP: 0, carryP: 0.85, samePal: 7 },
-  }[Math.min(round, 4)] || { rate: 0.2, cousinP: 0.15, wildP: 0, carryP: 0.9, samePal: 8 };
+    2: { rate: 0.55, cousinP: 0.4, wildP: 0.15, carryP: 0.35, samePal: 2, perArch: 2, spacing: 1.2, recentP: 0.7 },
+    3: { rate: 0.4, cousinP: 0.3, wildP: 0.06, carryP: 0.6, samePal: 4, perArch: 3, spacing: 0.9, recentP: 0.8 },
+    4: { rate: 0.25, cousinP: 0.2, wildP: 0, carryP: 0.85, samePal: 7, perArch: 5, spacing: 0.65, recentP: 0.9 },
+  }[Math.max(2, Math.min(round, 4))];
   const crossP = liked.length >= 2 ? 0.25 : 0;
 
   const fav = liked[liked.length - 1];
@@ -372,7 +406,7 @@ export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = 
   }
   // If the user has not shown interest in a print process, keep patterned
   // charts rare; if they picked one, let the print family come through.
-  const maxPatterned = liked.some(isPatterned) ? n : 2;
+  const maxPatterned = liked.some(isPatterned) ? n + existing.length : 2;
   const inModeIds = modeIds(prefs);
   const wildIdsFresh = inModeIds.filter((id) => !rejectedArchs.has(id));
   const wildIds = wildIdsFresh.length ? wildIdsFresh : inModeIds;
@@ -388,10 +422,10 @@ export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = 
     if (dist(g, fav) < 0.55) return false;
     if (labels.has(labelKey(g))) return false;
     if (strict) {
-      if ((archCount.get(g.archetype) || 0) >= 2) return false;
+      if ((archCount.get(g.archetype) || 0) >= cfg.perArch) return false;
       if (paletteKey(g) === favPal && samePal >= cfg.samePal) return false;
       if (isPatterned(g) && patterned >= maxPatterned) return false;
-      for (const o of out) if (dist(g, o) < 1.2) return false;
+      for (const o of [...existing, ...out]) if (dist(g, o) < cfg.spacing) return false;
     }
     return true;
   };
@@ -404,17 +438,17 @@ export function neighborSet(r, liked, n, round, isTaken, prefs, rejectedArchs = 
     out.push(g);
   };
   const likedArchs = new Set(liked.map((g) => g.archetype));
+  const parent = () => chance(r, cfg.recentP) ? fav : pick(r, liked);
   const generate = () => {
     const roll = r();
     if (roll < crossP) {
       // Two distinct parents — crossing a genome with itself is a no-op clone.
-      const i = Math.floor(r() * liked.length);
-      const j = (i + 1 + Math.floor(r() * (liked.length - 1))) % liked.length;
-      return crossover(r, liked[i], liked[j]);
+      const a = parent();
+      return crossover(r, a, pick(r, liked.filter(g => g !== a)));
     }
     if (roll < crossP + cfg.wildP) return randomGenome(r, pick(r, wildIds));
-    if (roll < crossP + cfg.wildP + cfg.cousinP) return cousin(r, pick(r, liked), rejectedArchs, prefs, likedArchs, cfg.carryP);
-    return mutate(r, pick(r, liked), cfg.rate);
+    if (roll < crossP + cfg.wildP + cfg.cousinP) return cousin(r, parent(), rejectedArchs, prefs, likedArchs, cfg.carryP);
+    return mutate(r, parent(), cfg.rate);
   };
 
   let guard = 0;

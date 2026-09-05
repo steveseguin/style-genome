@@ -20,8 +20,11 @@ The final style exports five artifacts:
 - **Link** — the genome lives in the URL hash, so any style can be bookmarked,
   shared, or reopened in the editor. **Import** reopens a saved .json or .md.
 
-Mis-clicked? **Back** undoes the last pick. **Re-roll** gives a fresh set of
-parameters for the same archetype.
+Mis-clicked? **Back** undoes the last pick, filter change, or refresh.
+**More options** explores a fresh grid without spending a round and preserves
+your current favorite. Progress and tile captions show where you are and which
+options vary your favorite or explore another family. **Re-roll** in the editor
+gives a fresh set of parameters for the same archetype.
 
 Legibility is enforced, not hoped for (`js/a11y.js`): every sampled genome
 passes a palette contrast check calibrated to its archetype, a light-only
@@ -104,6 +107,10 @@ A genome = **archetype × parameters × component motifs**:
   when the filters allow it (and openers never share an archetype). Optional
   quick filters (Light/Dark, Calm/Bold) constrain the whole session for people
   who already know that much.
+- The unfiltered opening sampler reserves at least five light and five dark
+  slots, while retaining family coverage and the caps on cream pages and print
+  textures. Presentation order is shuffled so constrained families do not
+  always occupy the first row.
 - **Rounds 2–4** sample neighbors of the liked set: same archetype re-rolled,
   "cousins" (related archetypes), crossovers of two liked styles, and
   early-round wildcards. Mutation radius shrinks each round. Convergence is
@@ -118,6 +125,11 @@ A genome = **archetype × parameters × component motifs**:
   but didn't pick are treated as soft rejections and avoided; and every grid
   enforces a minimum style-distance from your current favorite so you never
   see a near-clone of it.
+- Recent picks carry more weight as rounds progress. Repeated selections of
+  the same genome count as one crossover parent; different rolls of the same
+  archetype can still recombine. Later rounds allow more variations within an
+  archetype and tighter spacing, making refinement visibly closer to the
+  current favorite. Replacement tiles account for the remaining visible grid.
 
 ### Export (`js/export.js`, `js/prompt.js`, `js/starter.js`, `js/share.js`)
 

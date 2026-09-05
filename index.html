@@ -43,7 +43,7 @@
         <span class="ah-mark"></span>
         <span class="ah-name">Style Genome</span>
       </a>
-      <div class="ah-round" id="roundmsg"></div>
+      <div class="ah-round" id="roundmsg" aria-live="polite"></div>
       <label class="ah-structure" for="specimen-select">
         <span>Preview as</span>
         <select id="specimen-select" aria-label="Website structure preview"></select>
@@ -59,7 +59,7 @@
 
   <main class="stage" id="stage">
     <section class="intro" id="intro">
-      <h1 id="introtitle">Pick the one that draws you in.</h1>
+      <h1 id="introtitle" tabindex="-1">Pick the one that draws you in.</h1>
       <p id="introsub">Twelve deliberately different directions. Don't overthink it — go with your gut. Each round narrows in on your taste.</p>
       <div class="prefs" id="prefsbar">
         <span class="prefs-label">Know what you want already?</span>
@@ -73,6 +73,13 @@
           <button type="button" data-val="calm">Calm</button>
           <button type="button" data-val="bold">Bold</button>
         </div>
+      </div>
+      <div class="round-tools">
+        <ol class="round-progress" aria-label="Discovery progress">
+          <li>Explore</li><li>Connect</li><li>Refine</li><li>Choose</li>
+        </ol>
+        <button class="ah-restart" id="morebtn" type="button">More options</button>
+        <span class="round-detail" id="round-detail" aria-live="polite"></span>
       </div>
     </section>
 

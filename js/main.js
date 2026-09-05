@@ -87,6 +87,7 @@ function snapshot() {
     seen: new Set(state.seen),
     shownArchs: new Set(state.shownArchs),
     likedArchs: new Set(state.likedArchs),
+    prefs: { ...state.prefs },
     finalGenome: state.finalGenome ? JSON.parse(JSON.stringify(state.finalGenome)) : null,
   };
 }
@@ -98,6 +99,8 @@ function restore(snap) {
   state.seen = snap.seen;
   state.shownArchs = snap.shownArchs;
   state.likedArchs = snap.likedArchs;
+  state.prefs = snap.prefs;
+  syncPrefs();
 }
 
 function updateBackButton() {
@@ -122,6 +125,11 @@ function renderRound({ reuseGrid = false } = {}) {
   const favKey = state.liked.length ? genomeKey(state.liked[state.liked.length - 1]) : null;
 
   els.roundmsg.textContent = `Round ${state.round} of ${ROUNDS}`;
+  document.querySelectorAll(".round-progress li").forEach((step, index) => {
+    if (index + 1 === state.round) step.setAttribute("aria-current", "step");
+    else step.removeAttribute("aria-current");
+    step.classList.toggle("complete", index + 1 < state.round);
+  });
   els.prefsbar.hidden = state.round !== 1;
   if (state.round === 1) {
     els.introtitle.textContent = "Pick the one that draws you in.";
@@ -130,7 +138,7 @@ function renderRound({ reuseGrid = false } = {}) {
   } else if (state.round < ROUNDS) {
     els.introtitle.textContent = "Getting warmer — pick again.";
     els.introsub.textContent =
-      "Eleven new styles that share DNA with what you've liked so far, plus your current favorite. Pick your favorite of these twelve.";
+      "Your current favorite stays first. Compare new directions and variations, then pick what feels closer. More options keeps you in this round.";
   } else {
     els.introtitle.textContent = "Last round — final pick.";
     els.introsub.textContent =
@@ -154,6 +162,9 @@ function renderRound({ reuseGrid = false } = {}) {
 
     const viewport = document.createElement("div");
     viewport.className = "tile-viewport";
+    // The miniature is a visual preview, not a second set of interactive
+    // website controls in the keyboard's tab order.
+    el.inert = true;
     viewport.appendChild(el);
 
     const caption = document.createElement("div");
@@ -161,7 +172,7 @@ function renderRound({ reuseGrid = false } = {}) {
     const choose = document.createElement("button");
     choose.type = "button";
     choose.className = "tile-choose";
-    choose.setAttribute("aria-label", `Choose style: ${genomeName(g)}`);
+    choose.setAttribute("aria-label", `Choose style: ${genomeName(g)}, ${genomeGenesLabel(g)}${favKey === key ? ", current favorite" : ""}`);
     const name = document.createElement("span");
     name.className = "tile-name";
     name.textContent = genomeName(g);
@@ -178,7 +189,15 @@ function renderRound({ reuseGrid = false } = {}) {
       state.history.push(snapshot());
       enterFinale(g);
     });
-    choose.append(name, genes);
+    const relation = document.createElement("span");
+    relation.className = "tile-relation";
+    const favorite = state.liked[state.liked.length - 1];
+    relation.textContent = favKey === key ? "Current favorite" : !favorite
+      ? ARCHETYPES[g.archetype].family
+      : g.archetype === favorite.archetype ? "Variation of your favorite"
+      : ARCHETYPES[g.archetype].family === ARCHETYPES[favorite.archetype].family ? "Related design family"
+      : "Different design family";
+    choose.append(relation, name, genes);
     choose.addEventListener("click", () => onPick(g));
     caption.append(choose, use);
 
@@ -201,7 +220,7 @@ function renderRound({ reuseGrid = false } = {}) {
       for (let attempt = 0; attempt < 3; attempt++) {
         const sample = tile.querySelector(".sample");
         if (!hardFailures(auditContrast(sample)).length) return;
-        const replacement = replacementGenome();
+        const replacement = replacementGenome(index);
         if (!replacement) return;
         tileCss.delete(tile.dataset.key);
         state.grid[index] = replacement;
@@ -213,18 +232,22 @@ function renderRound({ reuseGrid = false } = {}) {
     });
   }
   updateBackButton();
+  const freshCount = state.grid.length - (favKey ? 1 : 0);
+  document.getElementById("round-detail").textContent = favKey
+    ? `${freshCount} new options · favorite preserved`
+    : `${state.grid.length} styles · ${state.grid.filter(g => !g.p.dark).length} light / ${state.grid.filter(g => g.p.dark).length} dark`;
   requestAnimationFrame(scaleAll);
 }
 
 // One more candidate for the current round, honoring the same constraints.
-function replacementGenome() {
+function replacementGenome(replacingIndex) {
   if (state.round === 1) {
     const onScreen = new Set(state.grid.map((g) => g.archetype));
     return diverseSet(state.r, 1, isTaken, state.prefs, onScreen)[0] || null;
   }
   const rejected = new Set([...state.shownArchs].filter((a) => !state.likedArchs.has(a)));
   const fav = state.liked[state.liked.length - 1];
-  const others = state.grid.filter((g) => g !== fav);
+  const others = state.grid.filter((g, index) => g !== fav && index !== replacingIndex);
   return neighborSet(state.r, state.liked, 1, state.round, isTaken, state.prefs, rejected, others)[0] || null;
 }
 
@@ -239,7 +262,13 @@ function onPick(g) {
   state.round += 1;
   renderRound();
   window.scrollTo({ top: 0, behavior: "instant" });
+  els.introtitle.focus({ preventScroll: true });
 }
+
+document.getElementById("morebtn").addEventListener("click", () => {
+  state.history.push(snapshot());
+  renderRound();
+});
 
 // Undo the last step: a pick returns to the previous grid; a re-roll or
 // import from the editor returns to the previous genome in the editor.
@@ -646,12 +675,24 @@ document.getElementById("import-load").addEventListener("click", () => {
 // ----------------------------------------------------------- quick filters
 
 // Only visible (and only wired to re-roll) during round 1, before any pick.
+function syncPrefs() {
+  document.querySelectorAll(".seg").forEach(seg => {
+    seg.querySelectorAll("button").forEach(button => {
+      const active = button.dataset.val === state.prefs[seg.dataset.pref];
+      button.classList.toggle("seg-on", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+  });
+}
+syncPrefs();
 document.querySelectorAll(".seg").forEach((seg) => {
   seg.addEventListener("click", (ev) => {
     const btn = ev.target.closest("button");
     if (!btn || state.round !== 1) return;
-    seg.querySelectorAll("button").forEach((b) => b.classList.toggle("seg-on", b === btn));
+    if (state.prefs[seg.dataset.pref] === btn.dataset.val) return;
+    state.history.push(snapshot());
     state.prefs[seg.dataset.pref] = btn.dataset.val;
+    syncPrefs();
     state.seen = new Set();
     state.shownArchs = new Set();
     renderRound();
