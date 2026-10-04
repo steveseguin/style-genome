@@ -768,11 +768,15 @@ function openFromHash() {
     setNote(`Could not read the style in this link: ${err.message}`);
   }
   if (!parsed) return false;
+  const previousSpecimen = state.specimen;
   if (SPECIMEN_IDS.includes(parsed.specimen)) {
     state.specimen = parsed.specimen;
     els.specimenSelect.value = parsed.specimen;
   }
-  if (state.finalGenome && genomeKey(state.finalGenome) === genomeKey(parsed.genome)) return true;
+  if (state.finalGenome && genomeKey(state.finalGenome) === genomeKey(parsed.genome)) {
+    if (state.specimen !== previousSpecimen) refreshFinale();
+    return true;
+  }
   if (state.finalGenome || state.liked.length) state.history.push(snapshot());
   enterFinale(parsed.genome);
   return true;
